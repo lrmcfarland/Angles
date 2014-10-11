@@ -320,8 +320,6 @@ Angles::Declination::Declination(const std::string& a_deg,
 }
 
 
-
-
 // =====================
 // ===== Longitude =====
 // =====================

@@ -75,6 +75,12 @@ namespace Angles {
     inline bool operator== (const Angle& rhs) const;
     inline bool operator!= (const Angle& rhs) const;
 
+    inline bool operator< (const Angle& rhs) const;
+    inline bool operator<= (const Angle& rhs) const;
+
+    inline bool operator> (const Angle& rhs) const;
+    inline bool operator>= (const Angle& rhs) const;
+
     // ----- inplace operators -----
 
     virtual Angle& operator+=(const Angle& rhs);
@@ -84,7 +90,7 @@ namespace Angles {
     virtual Angle& operator/=(const double& rhs) throw (Error);
 
     // ----- other methods -----
-    virtual void normalize();
+    virtual void normalize();  // TODO normalized -> return a new copy?
 
   private:
 
@@ -114,6 +120,22 @@ namespace Angles {
 
   inline bool Angle::operator!= (const Angle& rhs) const {
     return !operator==(rhs);
+  }
+
+  inline bool Angle::operator< (const Angle& rhs) const {
+    return m_value < rhs.value();
+  }
+
+  inline bool Angle::operator<= (const Angle& rhs) const {
+    return m_value <= rhs.value();
+  }
+
+  inline bool Angle::operator> (const Angle& rhs) const {
+    return m_value > rhs.value();
+  }
+
+  inline bool Angle::operator>= (const Angle& rhs) const {
+    return m_value >= rhs.value();
   }
 
   // ---------------------------

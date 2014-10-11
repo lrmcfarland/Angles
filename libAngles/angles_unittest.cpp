@@ -61,21 +61,66 @@ namespace {
   }
 
   TEST(Angle, NotEquivalence1) {
-    Angles::Angle a;
-    Angles::Angle b;
-    a.value(1);
-    b.value(1);
+    Angles::Angle a(1);
+    Angles::Angle b(1);
     EXPECT_FALSE(a != b);
   }
 
   TEST(Angle, NotEquivalence2) {
-    Angles::Angle a;
-    Angles::Angle b;
-    a.value(1);
-    b.value(-1);
+    Angles::Angle a(1);
+    Angles::Angle b(-1);
     EXPECT_TRUE(a != b);
   }
 
+
+  TEST(Angle, LessThan1) {
+    Angles::Angle a(10);
+    Angles::Angle b(20);
+    EXPECT_TRUE(a < b);
+  }
+
+  TEST(Angle, LessThan2) {
+    Angles::Angle a(10);
+    Angles::Angle b(20);
+    EXPECT_FALSE(b < a);
+  }
+
+  TEST(Angle, LessThanOrEqualTo1) {
+    Angles::Angle a(25.1);
+    Angles::Angle b(25.1);
+    EXPECT_TRUE(a <= b);
+  }
+
+  TEST(Angle, LessThanOrEqualTo2) {
+    Angles::Angle a(10.5);
+    Angles::Angle b(10.6);
+    EXPECT_FALSE(b <= a);
+  }
+
+
+  TEST(Angle, GreaterThan1) {
+    Angles::Angle a(20);
+    Angles::Angle b(10);
+    EXPECT_TRUE(a > b);
+  }
+
+  TEST(Angle, GreaterThan2) {
+    Angles::Angle a(20);
+    Angles::Angle b(10);
+    EXPECT_FALSE(b > a);
+  }
+
+  TEST(Angle, GreaterThanOrEqualTo1) {
+    Angles::Angle a(25.1);
+    Angles::Angle b(25.1);
+    EXPECT_TRUE(a >= b);
+  }
+
+  TEST(Angle, GreaterThanOrEqualTo2) {
+    Angles::Angle a(10.6);
+    Angles::Angle b(10.5);
+    EXPECT_FALSE(b >= a);
+  }
 
   // constructors (and implicitly radians() accessor)
 
