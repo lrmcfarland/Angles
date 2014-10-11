@@ -161,6 +161,39 @@ class TestAngle(unittest.TestCase):
 
     # test rich compare
 
+
+    @unittest.skip('TODO boost wrap operator==()')
+    def test_angle1_lt_angle1(self):
+        """Test richcompare operator<()"""
+        a = angles.Angle(10)
+        b = angles.Angle(20)
+        self.assertTrue(a < b)
+
+
+    @unittest.skip('TODO boost wrap operator==()')
+    def test_angle1_lt_angle2(self):
+        """Test richcompare operator<()"""
+        a = angles.Angle(10)
+        b = angles.Angle(20)
+        self.assertFalse(b < a)
+
+
+    @unittest.skip('TODO boost wrap operator==()')
+    def test_angle1_le_angle1(self):
+        """Test richcompare operator<=()"""
+        a = angles.Angle(10)
+        b = angles.Angle(10)
+        self.assertTrue(a <= b)
+
+
+    @unittest.skip('TODO boost wrap operator==()')
+    def test_angle1_le_angle2(self):
+        """Test richcompare operator<=()"""
+        a = angles.Angle(20)
+        b = angles.Angle(20.6)
+        self.assertFalse(b <= a)
+
+
     @unittest.skip('TODO boost wrap operator==()')
     def test_angle1_eq_angle1(self):
         """Test richcompare operator==()"""
@@ -192,6 +225,37 @@ class TestAngle(unittest.TestCase):
         another_angle = angles.Angle(-1)
         self.assertTrue(an_angle != another_angle)
 
+
+    @unittest.skip('TODO boost wrap operator!=()')
+    def test_angle1_gt_angle1(self):
+        """Test richcompare operato>()"""
+        a = angles.Angle(30)
+        b = angles.Angle(20)
+        self.assertTrue(a > b)
+
+
+    @unittest.skip('TODO boost wrap operator!=()')
+    def test_angle1_gt_angle2(self):
+        """Test richcompare operator>()"""
+        a = angles.Angle(30)
+        b = angles.Angle(20)
+        self.assertFalse(b > a)
+
+
+    @unittest.skip('TODO boost wrap operator!=()')
+    def test_angle1_ge_angle1(self):
+        """Test richcompare operator>=()"""
+        a = angles.Angle(10)
+        b = angles.Angle(10)
+        self.assertTrue(a >= b)
+
+
+    @unittest.skip('TODO boost wrap operator!=()')
+    def test_angle1_ge_angle2(self):
+        """Test richcompare operator>=()"""
+        a = angles.Angle(20.9)
+        b = angles.Angle(20.6)
+        self.assertFalse(b >= a)
 
 
     # operators
