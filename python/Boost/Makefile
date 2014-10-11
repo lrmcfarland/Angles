@@ -12,8 +12,8 @@ all: build
 build: setup.py boost_angle_module.cpp
 	${OSXFLAGS} python setup.py build
 
-test: build test_angle.py
-	./test_angle.sh -v
+test: build test_angles.py
+	./test_angles.sh -v
 
 clean:
 	rm -rf build

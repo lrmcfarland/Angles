@@ -2,6 +2,6 @@
 
 . ./setenv.sh
 
-python test_angle.py "$@"
+python test_angles.py "$@"
 
 # EoF
