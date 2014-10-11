@@ -22,6 +22,7 @@ make_me() {
     source_dirs=("$@")
 
     for source_dir in ${source_dirs[@]}; do
+	echo "======================================================================"
 	echo $source_dir
 	cd $source_dir
 	make $make_target

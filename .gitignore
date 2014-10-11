@@ -18,14 +18,13 @@
 *.pyc
 
 # executables
-libSpace/space_unittest
-libSpace/mepsilon
+libAngles/angles_unittest
 
 # builds
 python/Boost/build
 python/Manual/build
 
-python/Swig/_space.so
-python/Swig/space.py
-python/Swig/space_wrap.cxx
+python/Swig/_angles.so
+python/Swig/angles.py
+python/Swig/angles_wrap.cxx
 
