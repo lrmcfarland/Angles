@@ -24,6 +24,22 @@
 //  along with Orbits.  If not, see <http://www.gnu.org/licenses/>.
 // ================================================================
 
+
+// Notes: I had originaly had angles */ doubles, doubles */ angles and
+// could overload the operators directly, but when I tired to make
+// templates of this, I got a compile "error: overloaded 'operator*'
+// must have at least one parameter of class or enumeration type"
+// I decided it was apples and oranges anyway and removed it.
+//
+// Angles "specialized" to ignore range, but Angles *
+// LimitedRangeAngle returns an Angle even if it is out of range.
+//
+// Angles has min/max but does not use them. LimitedRangeAngles
+// assumes the template sets them the same for all instances.
+
+
+
+
 #pragma once
 
 #include <cmath>
@@ -32,6 +48,8 @@
 
 #include <utils.h>
 
+
+ 
 namespace Angles {
 
   // =================
@@ -50,11 +68,15 @@ namespace Angles {
 
     explicit Angle(const double& a_deg = 0.0,
 		   const double& a_min = 0.0,
-		   const double& a_sec = 0.0);
+		   const double& a_sec = 0.0,
+		   const double& a_minimum = 0.0,
+		   const double& a_maximum = 360);
 
     explicit Angle(const std::string& a_deg, // The ambiguity is in the box.
 		   const std::string& a_min = "0",
-		   const std::string& a_sec = "0");
+		   const std::string& a_sec = "0",
+		   const double& a_minimum = 0.0,
+		   const double& a_maximum = 360);
 
     virtual ~Angle() {};
 
@@ -69,6 +91,14 @@ namespace Angles {
     virtual void   radians(const double& a_value) {value(rad2deg(a_value));}
     virtual double radians() const                {return deg2rad(value());}
     double         getRadians() const             {return deg2rad(value());} // for boost
+
+    // not enforced by Angle, but is here to simplify wrapper
+    // generation for LimitedRangeAngles
+    const double& minimum() const {return m_minimum;}
+    double        getMinimum() const {return m_minimum;} // for boost
+
+    const double& maximum() const {return m_maximum;}
+    double        getMaximum() const {return m_maximum;} // for boost
 
     // ----- bool operators -----
 
@@ -86,8 +116,10 @@ namespace Angles {
     virtual Angle& operator+=(const Angle& rhs);
     virtual Angle& operator-=(const Angle& rhs);
 
-    virtual Angle& operator*=(const double& rhs);
-    virtual Angle& operator/=(const double& rhs) throw (Error);
+    virtual Angle& operator*=(const Angle& rhs);
+    virtual Angle& operator/=(const Angle& rhs) throw (DivideByZeroError, RangeError);
+    // LimitedRangeAngles can thow RangeError if dividing by a
+    // fraction, so the base class can not narrow the error types.
 
     // ----- other methods -----
     virtual void normalize();  // TODO normalized -> return a new copy?
@@ -96,6 +128,10 @@ namespace Angles {
 
     double m_value; // degrees for declination, latitude, longitude, seconds for right ascension
 
+    // not used here but simplifies python/Manual wrapper generation.
+    double m_minimum;
+    double m_maximum;
+
   };
 
   // ----- inline implementations of angle methods -----
@@ -103,12 +139,16 @@ namespace Angles {
   // copy constructor
   inline Angle::Angle(const Angle& a) {
     m_value = a.value();
-  };
+    m_minimum = a.minimum();
+    m_maximum = a.maximum();
+  }
 
   // copy assignment
   inline Angle& Angle::operator=(const Angle& rhs) {
     if (this == &rhs) return *this;
     m_value = rhs.value();
+    m_minimum = rhs.minimum();
+    m_maximum = rhs.maximum();
     return *this;
   }
 
@@ -142,19 +182,120 @@ namespace Angles {
   // ----- Angle operators -----
   // ---------------------------
 
+  // Angle "specilizations" that do not check range.
+
   Angle operator+ (const Angle& lhs, const Angle& rhs);
   Angle operator- (const Angle& lhs, const Angle& rhs);
   Angle operator- (const Angle& rhs); // unitary minus
 
-  Angle operator* (const Angle& lhs, const double& rhs);
-  Angle operator* (const double& lhs, const Angle& rhs);
+  Angle operator* (const Angle& lhs, const Angle& rhs);
+  Angle operator/ (const Angle& lhs, const Angle& rhs) throw (DivideByZeroError);
 
-  Angle operator/ (const Angle& lhs, const double& rhs) throw (Error);
-  Angle operator/ (const double& lhs, const Angle& rhs) throw (Error);
+
 
   // =============================
   // ===== LimitedRangeAngle =====
   // =============================
+
+
+ // limited range operator templates
+
+  // add
+  template <typename T>
+    T operator+(const T& lhs, const T& rhs) throw (RangeError) {
+
+    double temp(lhs.value() + rhs.value());
+
+    // ASSUMES: template class has the same minimum and maximum for all instances.
+    // TODO: construct angles from class template that enforces this.
+
+    if (temp < lhs.minimum())
+      throw RangeError("minimum exceeded");
+
+    if (temp > lhs.maximum())
+      throw RangeError("maximum exceeded");
+
+    return T(temp);
+  }
+
+
+  // subtract
+  template <typename T>
+    T operator-(const T& lhs, const T& rhs) throw (RangeError) {
+
+    double temp(lhs.value() - rhs.value());
+
+    // ASSUMES: template class has the same minimum and maximum for all instances.
+    // TODO: construct angles from class template that enforces this.
+
+    if (temp < lhs.minimum())
+      throw RangeError("minimum exceeded");
+
+    if (temp > lhs.maximum())
+      throw RangeError("maximum exceeded");
+
+    return T(temp);
+  }
+
+
+  // unitary minus
+  template <typename T>
+    T operator-(const T& rhs) throw(RangeError) {
+
+    double temp(-rhs.value());
+
+    if (temp < rhs.minimum())
+      throw RangeError("minimum exceeded");
+
+    if (temp > rhs.maximum())
+      throw RangeError("maximum exceeded");
+
+    return T(temp);
+  }
+
+
+  // multiply
+  template <typename T>
+    T operator*(const T& lhs, const T& rhs) throw (RangeError) {
+
+    double temp(lhs.value() * rhs.value());
+
+    // ASSUMES: template class has the same minimum and maximum for all instances.
+    // TODO: construct angles from class template that enforces this.
+
+    if (temp < lhs.minimum())
+      throw RangeError("minimum exceeded");
+
+    if (temp > lhs.maximum())
+      throw RangeError("maximum exceeded");
+
+    return T(temp);
+  }
+
+
+  // divide
+  template <typename T>
+    T operator/(const T& lhs, const T& rhs) throw (RangeError) {
+
+    double temp(lhs.value() / rhs.value());
+
+    // ASSUMES: template class has the same minimum and maximum for all instances.
+    // TODO: construct angles from class template that enforces this.
+
+    if (temp < lhs.minimum())
+      throw RangeError("minimum exceeded");
+
+    if (temp > lhs.maximum())
+      throw RangeError("maximum exceeded");
+
+    return T(temp);
+  }
+
+
+
+  // TODO template this, but with min/max parameters at the template level
+
+
 
   class LimitedRangeAngle : public Angle {
     // enforces range limits on angles, e.g. longitude -180 to 180,
@@ -178,68 +319,21 @@ namespace Angles {
 
     virtual ~LimitedRangeAngle() {};
 
-    inline LimitedRangeAngle(const LimitedRangeAngle& a);
-    inline LimitedRangeAngle& operator=(const LimitedRangeAngle& rhs);
-
-    // ----- accessors -----
-    const double& minimum() const {return m_minimum;}
-    double        getMinimum() const {return m_minimum;} // for boost
-
-    const double& maximum() const {return m_maximum;}
-    double        getMaximum() const {return m_maximum;} // for boost
-
-
     // ----- inplace operators -----
 
     virtual LimitedRangeAngle& operator+=(const LimitedRangeAngle& rhs) throw (RangeError);
     virtual LimitedRangeAngle& operator-=(const LimitedRangeAngle& rhs) throw (RangeError);
 
-    virtual LimitedRangeAngle& operator*=(const double& rhs) throw (RangeError);
-    virtual LimitedRangeAngle& operator/=(const double& rhs) throw (DivideByZeroError, RangeError);
-
-  private:
-
-    double m_minimum;
-    double m_maximum;
+    virtual LimitedRangeAngle& operator*=(const LimitedRangeAngle& rhs) throw (RangeError);
+    virtual LimitedRangeAngle& operator/=(const LimitedRangeAngle& rhs) throw (DivideByZeroError, RangeError);
 
   };
 
-  // ----- inline implementations of angle methods -----
-
-  // copy constructor
-  inline LimitedRangeAngle::LimitedRangeAngle(const LimitedRangeAngle& a) {
-    value(a.value());
-    m_minimum = a.minimum();
-    m_maximum = a.maximum();
-  };
-
-  // copy assignment
-  inline LimitedRangeAngle& LimitedRangeAngle::operator=(const LimitedRangeAngle& rhs) {
-    if (this == &rhs) return *this;
-    value(rhs.value());
-    m_minimum = rhs.minimum();
-    m_maximum = rhs.maximum();
-    return *this;
-  }
-
-  // ---------------------------------------
-  // ----- LimitedRangeAngle operators -----
-  // ---------------------------------------
-
-  LimitedRangeAngle operator+ (const LimitedRangeAngle& lhs, const LimitedRangeAngle& rhs) throw (RangeError);
-  LimitedRangeAngle operator- (const LimitedRangeAngle& lhs, const LimitedRangeAngle& rhs) throw (RangeError);
-
-  // TODO unitary minus
-
-  LimitedRangeAngle operator* (const LimitedRangeAngle& lhs, const double& rhs) throw (RangeError);
-  LimitedRangeAngle operator* (const double& lhs, const LimitedRangeAngle& rhs) throw (RangeError);
-
-  LimitedRangeAngle operator/ (const LimitedRangeAngle& lhs, const double& rhs)
-    throw (DivideByZeroError, RangeError);
 
   // =============================
   // ===== Declination Angle =====
   // =============================
+
 
   class Declination : public LimitedRangeAngle {
 
@@ -260,6 +354,14 @@ namespace Angles {
 			 const double& a_maximum =  90.0) throw (RangeError);
 
     virtual ~Declination() {};
+
+    // ----- inplace operators -----
+
+    virtual Declination& operator+=(const Declination& rhs) throw (RangeError);
+    virtual Declination& operator-=(const Declination& rhs) throw (RangeError);
+
+    virtual Declination& operator*=(const Declination& rhs) throw (RangeError);
+    virtual Declination& operator/=(const Declination& rhs) throw (DivideByZeroError, RangeError);
 
   };
 

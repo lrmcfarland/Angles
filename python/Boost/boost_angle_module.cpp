@@ -36,6 +36,8 @@ BOOST_PYTHON_MODULE(angles) {
     .def(init<>()) // default
     .def(init<double, double>()) // degrees, minutes
     .def(init<double, double, double>()) // degrees, minutes, seconds
+    .def(init<double, double, double, double>()) // degrees, minutes, seconds, minimum
+    .def(init<double, double, double, double, double>()) // degrees, minutes, seconds, minimum, maximum
 
     .def(init<Angles::Angle>()) // copy
 
@@ -60,11 +62,11 @@ BOOST_PYTHON_MODULE(angles) {
     .def(self - Angles::Angle())
     .def(Angles::Angle() - self)
 
-    .def(self * double())
-    .def(double() * self)
+    .def(self * Angles::Angle())
+    .def(Angles::Angle() * self)
 
-    .def(self / double())
-    .def(double() / self)
+    .def(self / Angles::Angle())
+    .def(Angles::Angle() / self)
 
     .def("normalize", &Angles::Angle::normalize)
 

@@ -32,15 +32,19 @@
 
 Angles::Angle::Angle(const double& a_deg_or_hr,
 		     const double& a_min,
-		     const double& a_sec)
-{
+		     const double& a_sec,
+		     const double& a_minimum,
+		     const double& a_maximum)
+  : m_minimum(a_minimum), m_maximum(a_maximum) {
   value(degrees2seconds(a_deg_or_hr, a_min, a_sec)/3600.0);
 }
 
 Angles::Angle::Angle(const std::string& a_deg_or_hr,
 		     const std::string& a_min,
-		     const std::string& a_sec)
-{
+		     const std::string& a_sec,
+		     const double& a_minimum,
+		     const double& a_maximum)
+  : m_minimum(a_minimum), m_maximum(a_maximum) {
   value(Angle(Angles::stod(a_deg_or_hr),
 	      Angles::stod(a_min),
 	      Angles::stod(a_sec)).value());
@@ -60,16 +64,16 @@ Angles::Angle& Angles::Angle::operator-=(const Angle& rhs) {
   return *this;
 }
 
-Angles::Angle& Angles::Angle::operator*=(const double& rhs) {
-  m_value *= rhs;
+Angles::Angle& Angles::Angle::operator*=(const Angle& rhs) {
+  m_value *= rhs.value();
   return *this;
 }
 
-Angles::Angle& Angles::Angle::operator/=(const double& rhs) throw (Error) {
-  // LimitedRangeAngle can also raises RangeError
-  if (rhs == 0)
+Angles::Angle& Angles::Angle::operator/=(const Angle& rhs) throw (DivideByZeroError, RangeError) {
+  // LimitedRangeAngle can also raise RangeError
+  if (rhs.value() == 0)
     throw DivideByZeroError();
-  m_value /= rhs;
+  m_value /= rhs.value();
   return *this;
 }
 
@@ -85,26 +89,15 @@ Angles::Angle Angles::operator-(const Angles::Angle& rhs) {
   return Angles::Angle(-rhs.value());
 }
 
-Angles::Angle Angles::operator*(const Angles::Angle& lhs, const double& rhs) {
-  return Angles::Angle(lhs.value() * rhs);
+Angles::Angle Angles::operator*(const Angles::Angle& lhs, const Angles::Angle& rhs) {
+  return Angles::Angle(lhs.value() * rhs.value());
 }
 
-Angles::Angle Angles::operator*(const double& lhs, const Angles::Angle& rhs) {
-  return Angles::Angle(lhs * rhs.value());
-}
-
-Angles::Angle Angles::operator/(const Angles::Angle& lhs, const double& rhs)
-  throw (Error) {
-  if (rhs == 0)
-    throw DivideByZeroError();
-  return Angles::Angle(lhs.value() / rhs);
-}
-
-Angles::Angle Angles::operator/(const double& lhs, const Angles::Angle& rhs)
-  throw (Error) {
+Angles::Angle Angles::operator/(const Angles::Angle& lhs, const Angles::Angle& rhs)
+  throw (DivideByZeroError) {
   if (rhs.value() == 0)
     throw DivideByZeroError();
-  return Angles::Angle(lhs / rhs.value());
+  return Angles::Angle(lhs.value() / rhs.value());
 }
 
 
@@ -148,7 +141,7 @@ Angles::LimitedRangeAngle::LimitedRangeAngle(const double& a_deg_or_hr,
 					     const double& a_sec,
 					     const double& a_minimum,
 					     const double& a_maximum) throw(RangeError)
-  : Angle(a_deg_or_hr, a_min, a_sec), m_minimum(a_minimum), m_maximum(a_maximum) {
+  : Angle(a_deg_or_hr, a_min, a_sec, a_minimum, a_maximum) {
 
   if (value() < minimum())
       throw RangeError("minimum exceeded");
@@ -164,7 +157,7 @@ Angles::LimitedRangeAngle::LimitedRangeAngle(const std::string& a_deg_or_hr,
 					     const std::string& a_sec,
 					     const double& a_minimum,
 					     const double& a_maximum) throw(RangeError)
-  : Angle(a_deg_or_hr, a_min, a_sec), m_minimum(a_minimum), m_maximum(a_maximum) {
+  : Angle(a_deg_or_hr, a_min, a_sec, a_minimum, a_maximum) {
   value(LimitedRangeAngle(Angles::stod(a_deg_or_hr),
 			  Angles::stod(a_min),
 			  Angles::stod(a_sec),
@@ -175,7 +168,7 @@ Angles::LimitedRangeAngle::LimitedRangeAngle(const std::string& a_deg_or_hr,
 }
 
 
-// ----- operators -----
+// ----- inplace operators -----
 
 Angles::LimitedRangeAngle& Angles::LimitedRangeAngle::operator+=(const LimitedRangeAngle& rhs)
   throw (RangeError) {
@@ -221,10 +214,10 @@ Angles::LimitedRangeAngle& Angles::LimitedRangeAngle::operator-=(const LimitedRa
   return *this;
 }
 
-Angles::LimitedRangeAngle& Angles::LimitedRangeAngle::operator*=(const double& rhs)
+Angles::LimitedRangeAngle& Angles::LimitedRangeAngle::operator*=(const Angles::LimitedRangeAngle& rhs)
   throw (RangeError) {
 
-  double temp(value() * rhs);
+  double temp(value() * rhs.value());
 
   if (temp < minimum())
     throw RangeError("minimum exceeded");
@@ -237,13 +230,13 @@ Angles::LimitedRangeAngle& Angles::LimitedRangeAngle::operator*=(const double& r
   return *this;
 }
 
-Angles::LimitedRangeAngle& Angles::LimitedRangeAngle::operator/=(const double& rhs)
+Angles::LimitedRangeAngle& Angles::LimitedRangeAngle::operator/=(const Angles::LimitedRangeAngle& rhs)
   throw (DivideByZeroError, RangeError) {
 
-  if (rhs == 0)
+  if (rhs.value() == 0)
     throw DivideByZeroError();
 
-  double temp(value() / rhs);
+  double temp(value() / rhs.value());
 
   if (temp < minimum())
     throw RangeError("minimum exceeded");
@@ -255,44 +248,6 @@ Angles::LimitedRangeAngle& Angles::LimitedRangeAngle::operator/=(const double& r
 
   return *this;
 }
-
-Angles::LimitedRangeAngle Angles::operator+(const Angles::LimitedRangeAngle& lhs,
-					    const Angles::LimitedRangeAngle& rhs)
-  throw (RangeError) {
-  Angles::LimitedRangeAngle result(lhs);
-  return result += rhs;
-}
-
-Angles::LimitedRangeAngle Angles::operator-(const Angles::LimitedRangeAngle& lhs,
-					    const Angles::LimitedRangeAngle& rhs)
-  throw (RangeError) {
-  Angles::LimitedRangeAngle result(lhs);
-  return result -= rhs;
-}
-
-Angles::LimitedRangeAngle Angles::operator*(const Angles::LimitedRangeAngle& lhs,
-					    const double& rhs)
- throw (RangeError) {
-  Angles::LimitedRangeAngle result(lhs);
-  return result *= rhs;
-}
-
-Angles::LimitedRangeAngle Angles::operator*(const double& lhs,
-					    const Angles::LimitedRangeAngle& rhs)
-  throw (RangeError) {
-  Angles::LimitedRangeAngle result(rhs);
-  return result *= lhs;
-}
-
-Angles::LimitedRangeAngle Angles::operator/(const Angles::LimitedRangeAngle& lhs,
-					    const double& rhs)
-  throw (DivideByZeroError, RangeError) {
-  if (rhs == 0)
-    throw DivideByZeroError();
-  Angles::LimitedRangeAngle result(lhs);
-  return result /= rhs;
-}
-
 
 // =======================
 // ===== Declination =====
@@ -317,6 +272,88 @@ Angles::Declination::Declination(const std::string& a_deg,
 				 const double& a_maximum) throw(RangeError)
   : LimitedRangeAngle(a_deg, a_min, a_sec, a_minimum, a_maximum) {
   // TODO delegating constructors in C++11
+}
+
+
+// ----- inplace operators -----
+
+Angles::Declination& Angles::Declination::operator+=(const Declination& rhs)
+  throw (RangeError) {
+
+  if (minimum() != rhs.minimum())
+    throw RangeError("range minimums are not equal");
+
+  if (maximum() != rhs.maximum())
+    throw RangeError("range maximums are not equal");
+
+  double temp(value() + rhs.value());
+
+  if (temp < minimum())
+    throw RangeError("minimum exceeded");
+
+  if (temp > maximum())
+    throw RangeError("maximum exceeded");
+
+  value(temp);
+
+  return *this;
+}
+
+Angles::Declination& Angles::Declination::operator-=(const Declination& rhs)
+  throw (RangeError) {
+
+  if (minimum() != rhs.minimum())
+    throw RangeError("range minimums are not equal");
+
+  if (maximum() != rhs.maximum())
+    throw RangeError("range maximums are not equal");
+
+  double temp(value() - rhs.value());
+
+  if (temp < minimum())
+    throw RangeError("minimum exceeded");
+
+  if (temp > maximum())
+    throw RangeError("maximum exceeded");
+
+  value(temp);
+
+  return *this;
+}
+
+Angles::Declination& Angles::Declination::operator*=(const Angles::Declination& rhs)
+  throw (RangeError) {
+
+  double temp(value() * rhs.value());
+
+  if (temp < minimum())
+    throw RangeError("minimum exceeded");
+
+  if (temp > maximum())
+    throw RangeError("maximum exceeded");
+
+  value(temp);
+
+  return *this;
+}
+
+Angles::Declination& Angles::Declination::operator/=(const Angles::Declination& rhs)
+  throw (DivideByZeroError, RangeError) {
+
+  if (rhs.value() == 0)
+    throw DivideByZeroError();
+
+  double temp(value() / rhs.value());
+
+  if (temp < minimum())
+    throw RangeError("minimum exceeded");
+
+  if (temp > maximum())
+    throw RangeError("maximum exceeded");
+
+  value(temp);
+
+  return *this;
 }
 
 
