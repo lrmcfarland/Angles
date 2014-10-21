@@ -46,6 +46,94 @@ namespace {
     EXPECT_DOUBLE_EQ(45, a);
   }
 
+  // constructors (and implicitly radians() accessor)
+
+  TEST(Angle, CopyConstructor) {
+    Angles::Angle a;
+    a.value(1);
+    Angles::Angle b(a);
+    EXPECT_TRUE(a == b);
+  }
+
+  TEST(Angle, CopyAssign) {
+    Angles::Angle a;
+    a.value(1);
+    Angles::Angle b = a;
+    EXPECT_TRUE(a == b);
+  }
+
+  TEST(Angle, DefaultConstructor) {
+    Angles::Angle a;
+    EXPECT_EQ(0, a.radians());
+  }
+
+
+  TEST(Angle, ConstructorDeg) {
+    Angles::Angle a(-45);
+    EXPECT_EQ(Angles::Angle::deg2rad(-45), a.radians());
+  }
+
+  TEST(Angle, ConstructorDegFromStr) {
+    Angles::Angle a("-45");
+    EXPECT_EQ(Angles::Angle::deg2rad(-45), a.radians());
+  }
+
+  TEST(Angle, ConstructorDegMin) {
+    Angles::Angle a(0, -60);
+    EXPECT_EQ(Angles::Angle::deg2rad(-1), a.radians());
+  }
+
+  TEST(Angle, ConstructorDegMinFromStr) {
+    Angles::Angle a("0", "-60");
+    EXPECT_EQ(Angles::Angle::deg2rad(-1), a.radians());
+  }
+
+  TEST(Angle, ConstructorDegMinSec) {
+    Angles::Angle a(0, 0, -1);
+    EXPECT_DOUBLE_EQ(Angles::Angle::deg2rad(-1/3600.0), a.radians());
+  }
+
+  TEST(Angle, ConstructorDegMinSecFromStr) {
+    Angles::Angle a("0", "0", "-6.1");
+    EXPECT_DOUBLE_EQ(Angles::Angle::deg2rad(-6.1/3600.0), a.radians());
+  }
+
+  // TODO correct behavior?
+  TEST(Angle, MixedSignX) {
+    Angles::Angle a(-1, 2);
+    Angles::Angle b(1, -2);
+    EXPECT_FALSE(a.value() == b.value());
+  }
+
+  TEST(Angle, MixedSign1) {
+    Angles::Angle a(-1, 2);
+    Angles::Angle b(-1, -2);
+    EXPECT_DOUBLE_EQ(a.value(), b.value());
+  }
+
+  TEST(Angle, MixedSign2) {
+    Angles::Angle a(-1, 2, 3);
+    Angles::Angle b(-1, -2, -3);
+    EXPECT_DOUBLE_EQ(a.value(), b.value());
+  }
+
+  TEST(Angle, MixedSign3) {
+    Angles::Angle a(1, 2, 3);
+    Angles::Angle b(1, -2, -3);
+    EXPECT_DOUBLE_EQ(a.value(), b.value());
+  }
+
+  // accessors
+
+  TEST(Angle, Accessors) {
+    Angles::Angle a(-45);
+    EXPECT_EQ(-45, a.value());
+    EXPECT_EQ(-45, a.getValue());
+    EXPECT_EQ(Angles::Angle::deg2rad(-45), a.radians());
+    EXPECT_EQ(Angles::Angle::deg2rad(-45), a.getRadians());
+  }
+
+
   // ----- booleans -----
 
   TEST(Angle, Equivalence1) {
@@ -123,94 +211,6 @@ namespace {
     Angles::Angle b(10.5);
     EXPECT_FALSE(b >= a);
   }
-
-  // constructors (and implicitly radians() accessor)
-
-  TEST(Angle, CopyConstructor) {
-    Angles::Angle a;
-    a.value(1);
-    Angles::Angle b(a);
-    EXPECT_TRUE(a == b);
-  }
-
-  TEST(Angle, CopyAssign) {
-    Angles::Angle a;
-    a.value(1);
-    Angles::Angle b = a;
-    EXPECT_TRUE(a == b);
-  }
-
-  TEST(Angle, ConstructorDefault) {
-    Angles::Angle a;
-    EXPECT_EQ(0, a.radians());
-  }
-
-  // positive angles in limited range tests
-  TEST(Angle, ConstructorDeg) {
-    Angles::Angle a(-45);
-    EXPECT_EQ(Angles::Angle::deg2rad(-45), a.radians());
-  }
-
-  TEST(Angle, ConstructorDegFromStr) {
-    Angles::Angle a("-45");
-    EXPECT_EQ(Angles::Angle::deg2rad(-45), a.radians());
-  }
-
-  TEST(Angle, ConstructorDegMin) {
-    Angles::Angle a(0, -60);
-    EXPECT_EQ(Angles::Angle::deg2rad(-1), a.radians());
-  }
-
-  TEST(Angle, ConstructorDegMinFromStr) {
-    Angles::Angle a("0", "-60");
-    EXPECT_EQ(Angles::Angle::deg2rad(-1), a.radians());
-  }
-
-  TEST(Angle, ConstructorDegMinSec) {
-    Angles::Angle a(0, 0, -1);
-    EXPECT_DOUBLE_EQ(Angles::Angle::deg2rad(-1/3600.0), a.radians());
-  }
-
-  TEST(Angle, ConstructorDegMinSecFromStr) {
-    Angles::Angle a("0", "0", "-6.1");
-    EXPECT_DOUBLE_EQ(Angles::Angle::deg2rad(-6.1/3600.0), a.radians());
-  }
-
-  // TODO correct behavior?
-  TEST(Angle, MixedSignX) {
-    Angles::Angle a(-1, 2);
-    Angles::Angle b(1, -2);
-    EXPECT_FALSE(a.value() == b.value());
-  }
-
-  TEST(Angle, MixedSign1) {
-    Angles::Angle a(-1, 2);
-    Angles::Angle b(-1, -2);
-    EXPECT_DOUBLE_EQ(a.value(), b.value());
-  }
-
-  TEST(Angle, MixedSign2) {
-    Angles::Angle a(-1, 2, 3);
-    Angles::Angle b(-1, -2, -3);
-    EXPECT_DOUBLE_EQ(a.value(), b.value());
-  }
-
-  TEST(Angle, MixedSign3) {
-    Angles::Angle a(1, 2, 3);
-    Angles::Angle b(1, -2, -3);
-    EXPECT_DOUBLE_EQ(a.value(), b.value());
-  }
-
-  // accessors
-
-  TEST(Angle, Accessors) {
-    Angles::Angle a(-45);
-    EXPECT_EQ(-45, a.value());
-    EXPECT_EQ(-45, a.getValue());
-    EXPECT_EQ(Angles::Angle::deg2rad(-45), a.radians());
-    EXPECT_EQ(Angles::Angle::deg2rad(-45), a.getRadians());
-  }
-
 
   // operators
 
@@ -335,6 +335,16 @@ namespace {
   }
 
 
+  // operator<<
+
+  TEST(Angle, operatorStdOut) {
+    Angles::Angle a(44, 32, 15.4);
+    std::stringstream out;
+    out << a;
+    EXPECT_STREQ("44* 32' 15.4\"", out.str().c_str());
+  }
+
+
   // 360 and beyond
 
   TEST(Angle, Stdout360) {
@@ -371,106 +381,208 @@ namespace {
   // ----- LimitedRangeAngle -----
   // -----------------------------
 
-  TEST(LimitedRangeAngle, OutputOperator1) {
-    Angles::LimitedRangeAngle a(23, 26, 12.1);
-    std::stringstream out;
-    out << a;
-    EXPECT_STREQ("23* 26' 12.1\"", out.str().c_str());
+  // ----- static methods -----
+
+  TEST(LimitedRangeAngle, Degree2Radians) {
+    double a = Angles::LimitedRangeAngle::deg2rad(45);
+    EXPECT_DOUBLE_EQ(0.78539816339744828, a);
   }
 
-  // constructors (and implicitly radians() accessor)
+  TEST(LimitedRangeAngle, Radian2Degrees) {
+    double a = Angles::LimitedRangeAngle::rad2deg(0.78539816339744828);
+    EXPECT_DOUBLE_EQ(45, a);
+  }
 
-  TEST(LimitedRangeAngle, ConstructorDefault) {
+  // ----- constructors -----
+
+  TEST(LimitedRangeAngle, CopyConstructor) {
+    Angles::LimitedRangeAngle a(30);
+    Angles::LimitedRangeAngle b(a);
+    EXPECT_EQ(a.value(), b.value());
+  }
+  
+  TEST(LimitedRangeAngle, CopyAssign) {
+    Angles::LimitedRangeAngle a(-35);
+    Angles::LimitedRangeAngle b;
+    b = a;
+    EXPECT_EQ(a.value(), b.value());
+  }
+
+  TEST(LimitedRangeAngle, DefaultConstructor) {
     Angles::LimitedRangeAngle a;
-    EXPECT_EQ(0, a.radians());
+    EXPECT_EQ(0, a.value());
   }
 
   TEST(LimitedRangeAngle, ConstructorDeg) {
     Angles::LimitedRangeAngle a(45);
-    EXPECT_EQ(Angles::Angle::deg2rad(45), a.radians());
+    EXPECT_EQ(45, a.value());
+    EXPECT_EQ(Angles::LimitedRangeAngle::deg2rad(45), a.radians());
   }
 
-  TEST(LimitedRangeAngle, ConstructorDegStr) {
-    Angles::LimitedRangeAngle a("45");
-    EXPECT_EQ(Angles::Angle::deg2rad(45), a.radians());
+  TEST(LimitedRangeAngle, ConstructorDegFromString) {
+    Angles::LimitedRangeAngle a("-45.0");
+    EXPECT_EQ(-45, a.value());
+    EXPECT_EQ(Angles::LimitedRangeAngle::deg2rad(-45), a.radians());
   }
 
   TEST(LimitedRangeAngle, ConstructorDegMin) {
-    Angles::LimitedRangeAngle a(0, 60);
-    EXPECT_EQ(Angles::Angle::deg2rad(1), a.radians());
+    Angles::LimitedRangeAngle a(44, 60);
+    EXPECT_EQ(45, a.value());
+    EXPECT_EQ(Angles::LimitedRangeAngle::deg2rad(45), a.radians());
   }
 
-  TEST(LimitedRangeAngle, ConstructorDegMinStr) {
-    Angles::LimitedRangeAngle a("0", "60");
-    EXPECT_EQ(Angles::Angle::deg2rad(1), a.radians());
+  TEST(LimitedRangeAngle, ConstructorDegMinFromString) {
+    Angles::LimitedRangeAngle a("-44.0", "60");
+    EXPECT_EQ(-45, a.value());
+    EXPECT_EQ(Angles::LimitedRangeAngle::deg2rad(-45), a.radians());
   }
 
   TEST(LimitedRangeAngle, ConstructorDegMinSec) {
-    Angles::LimitedRangeAngle a(0, 0, 1);
-    EXPECT_DOUBLE_EQ(Angles::Angle::deg2rad(1/3600.0), a.radians());
+    Angles::LimitedRangeAngle a(44, 59, 60);
+    EXPECT_EQ(45, a.value());
+    EXPECT_EQ(Angles::LimitedRangeAngle::deg2rad(45), a.radians());
   }
 
-  TEST(LimitedRangeAngle, ConstructorDegMinSecStr) {
-    Angles::LimitedRangeAngle a("0", "0", "6.1");
-    EXPECT_DOUBLE_EQ(Angles::Angle::deg2rad(6.1/3600.0), a.radians());
+  TEST(LimitedRangeAngle, ConstructorDegMinSecFromString) {
+    Angles::LimitedRangeAngle a("-44.0", "59", "60");
+    EXPECT_EQ(-45, a.value());
+    EXPECT_EQ(Angles::LimitedRangeAngle::deg2rad(-45), a.radians());
   }
 
-  TEST(LimitedRangeAngle, ConstructorCopy) {
-    Angles::LimitedRangeAngle a(1, 2, 3);
-    Angles::LimitedRangeAngle b(a);
-    EXPECT_EQ(a, b);
+  // range errors
+
+  TEST(LimitedRangeAngle, OutOfRangeError_360) {
+    EXPECT_NO_THROW(Angles::LimitedRangeAngle(-360));
   }
 
-  TEST(LimitedRangeAngle, ConstructorAssign) {
-    Angles::LimitedRangeAngle a(1, 2, 3);
-    Angles::LimitedRangeAngle b;
-    b = a;
-    EXPECT_EQ(a, b);
+  TEST(LimitedRangeAngle, OutOfRangeError360) {
+    EXPECT_NO_THROW(Angles::LimitedRangeAngle(360));
   }
 
-  TEST(LimitedRangeAngle, OutOfRangeError0) {
-    EXPECT_NO_THROW(Angles::LimitedRangeAngle(0));
+  TEST(LimitedRangeAngle, OutOfRangeError_361) {
+    EXPECT_THROW(Angles::LimitedRangeAngle(-361), Angles::RangeError);
   }
 
-  TEST(LimitedRangeAngle, OutOfRangeError1) {
-    EXPECT_THROW(Angles::LimitedRangeAngle("-45"), Angles::RangeError);
-  }
-
-  TEST(LimitedRangeAngle, OutOfRangeError2) {
+  TEST(LimitedRangeAngle, OutOfRangeError361) {
     EXPECT_THROW(Angles::LimitedRangeAngle(361), Angles::RangeError);
   }
 
-  TEST(LimitedRangeAngle, OutOfRangeError3) {
+  TEST(LimitedRangeAngle, OutOfRangeError_360Str) {
+    EXPECT_NO_THROW(Angles::LimitedRangeAngle("-360"));
+  }
+
+  TEST(LimitedRangeAngle, OutOfRangeError360Str) {
     EXPECT_NO_THROW(Angles::LimitedRangeAngle("360"));
   }
 
-  // bool operators
+  TEST(LimitedRangeAngle, OutOfRangeError_361Str) {
+    EXPECT_THROW(Angles::LimitedRangeAngle("-361"), Angles::RangeError);
+  }
 
-  TEST(LimitedRangeAngle, OperatorEQ_1) {
-    Angles::LimitedRangeAngle a(1, 2, 3);
-    Angles::LimitedRangeAngle b(a);
+  TEST(LimitedRangeAngle, OutOfRangeError361Str) {
+    EXPECT_THROW(Angles::LimitedRangeAngle("361"), Angles::RangeError);
+  }
+
+
+  // TODO sign errors? Utils tested below.
+
+
+  // accessors
+
+
+  TEST(LimitedRangeAngle, Accessors1) {
+    Angles::LimitedRangeAngle a(45);
+    EXPECT_EQ(45, a.value());
+    EXPECT_EQ(45, a.getValue());
+    EXPECT_EQ(Angles::LimitedRangeAngle::deg2rad(45), a.radians());
+    EXPECT_EQ(Angles::LimitedRangeAngle::deg2rad(45), a.getRadians());
+    EXPECT_EQ(-360, a.minimum());
+    EXPECT_EQ(-360, a.getMinimum());
+    EXPECT_EQ(360, a.maximum());
+    EXPECT_EQ(360, a.getMaximum());
+  }
+
+
+  // ----- booleans -----
+
+
+  TEST(LimitedRangeAngle, Equivalence1) {
+    Angles::LimitedRangeAngle a;
+    Angles::LimitedRangeAngle b;
+    a.value(1);
+    b.value(1);
     EXPECT_TRUE(a == b);
   }
 
-  TEST(LimitedRangeAngle, OperatorEQ_2) {
-    Angles::LimitedRangeAngle a(1, 2, 3);
-    Angles::LimitedRangeAngle b(4, 5, 6);
-    EXPECT_TRUE(a != b);
+  TEST(LimitedRangeAngle, Equivalence2) {
+    Angles::LimitedRangeAngle a;
+    Angles::LimitedRangeAngle b;
+    a.value(1);
+    b.value(-1);
+    EXPECT_FALSE(a == b);
   }
 
-  TEST(LimitedRangeAngle, OperatorNE_1) {
-    Angles::LimitedRangeAngle a(1, 2, 3);
-    Angles::LimitedRangeAngle b(a);
+  TEST(LimitedRangeAngle, NotEquivalence1) {
+    Angles::LimitedRangeAngle a(1);
+    Angles::LimitedRangeAngle b(1);
     EXPECT_FALSE(a != b);
   }
 
-  TEST(LimitedRangeAngle, OperatorNE_2) {
-    Angles::LimitedRangeAngle a(1, 2, 3);
-    Angles::LimitedRangeAngle b(4, 2, 3);
+  TEST(LimitedRangeAngle, NotEquivalence2) {
+    Angles::LimitedRangeAngle a(1);
+    Angles::LimitedRangeAngle b(-1);
     EXPECT_TRUE(a != b);
   }
 
-  // tests templates for arithmetic operators
+  TEST(LimitedRangeAngle, LessThan1) {
+    Angles::LimitedRangeAngle a(10);
+    Angles::LimitedRangeAngle b(20);
+    EXPECT_TRUE(a < b);
+  }
+
+  TEST(LimitedRangeAngle, LessThan2) {
+    Angles::LimitedRangeAngle a(10);
+    Angles::LimitedRangeAngle b(20);
+    EXPECT_FALSE(b < a);
+  }
+
+  TEST(LimitedRangeAngle, LessThanOrEqualTo1) {
+    Angles::LimitedRangeAngle a(25.1);
+    Angles::LimitedRangeAngle b(25.1);
+    EXPECT_TRUE(a <= b);
+  }
+
+  TEST(LimitedRangeAngle, LessThanOrEqualTo2) {
+    Angles::LimitedRangeAngle a(10.5);
+    Angles::LimitedRangeAngle b(10.6);
+    EXPECT_FALSE(b <= a);
+  }
+
+  TEST(LimitedRangeAngle, GreaterThan1) {
+    Angles::LimitedRangeAngle a(20);
+    Angles::LimitedRangeAngle b(10);
+    EXPECT_TRUE(a > b);
+  }
+
+  TEST(LimitedRangeAngle, GreaterThan2) {
+    Angles::LimitedRangeAngle a(20);
+    Angles::LimitedRangeAngle b(10);
+    EXPECT_FALSE(b > a);
+  }
+
+  TEST(LimitedRangeAngle, GreaterThanOrEqualTo1) {
+    Angles::LimitedRangeAngle a(25.1);
+    Angles::LimitedRangeAngle b(25.1);
+    EXPECT_TRUE(a >= b);
+  }
+
+  TEST(LimitedRangeAngle, GreaterThanOrEqualTo2) {
+    Angles::LimitedRangeAngle a(10.6);
+    Angles::LimitedRangeAngle b(10.5);
+    EXPECT_FALSE(b >= a);
+  }
+
+  // arithmetic operators
 
   // add
   TEST(LimitedRangeAngle, InplaceAddAngle) {
@@ -481,8 +593,8 @@ namespace {
   }
 
   TEST(LimitedRangeAngle, OutOfRangeErrorInplaceAdd) {
-    Angles::LimitedRangeAngle a(345);
-    Angles::LimitedRangeAngle b(345);
+    Angles::LimitedRangeAngle a(350);
+    Angles::LimitedRangeAngle b(45);
     EXPECT_THROW(a += b, Angles::RangeError);
   }
 
@@ -495,11 +607,10 @@ namespace {
   }
 
   TEST(LimitedRangeAngle, OutOfRangeErrorAdd) {
-    Angles::LimitedRangeAngle a(345);
-    Angles::LimitedRangeAngle b(345);
+    Angles::LimitedRangeAngle a(350);
+    Angles::LimitedRangeAngle b(45);
     EXPECT_THROW(a + b, Angles::RangeError);
   }
-
 
   // subtract
 
@@ -511,8 +622,8 @@ namespace {
   }
 
   TEST(LimitedRangeAngle, OutOfRangeErrorInplaceSubtract) {
-    Angles::LimitedRangeAngle a(0);
-    Angles::LimitedRangeAngle b(345);
+    Angles::LimitedRangeAngle a(-360);
+    Angles::LimitedRangeAngle b(1);
     EXPECT_THROW(a -= b, Angles::RangeError);
   }
 
@@ -525,26 +636,32 @@ namespace {
   }
 
   TEST(LimitedRangeAngle, OutOfRangeErrorSubtract) {
-    Angles::LimitedRangeAngle a(0);
-    Angles::LimitedRangeAngle b(345);
+    Angles::LimitedRangeAngle a(-360);
+    Angles::LimitedRangeAngle b(1);
     EXPECT_THROW(a - b, Angles::RangeError);
   }
 
-  // unitary minus needs a negative range like dec., default limited range is 0 to 360
+  // unitary minus
+
+  TEST(LimitedRangeAngle, UnitaryMinus) {
+    Angles::LimitedRangeAngle a;
+    Angles::LimitedRangeAngle b(-45);
+    a = -b;
+    EXPECT_DOUBLE_EQ(45, a.value());
+  }
 
   // multiply
 
-  TEST(LimitedRangeAngle, InplaceMultiplyDouble) {
-    Angles::Angle a(45);
-    Angles::Angle b(2);
-    a *= b;
-    EXPECT_DOUBLE_EQ(90, a.value());
+  TEST(LimitedRangeAngle, OutOfRangeErrorMultiply) {
+    Angles::LimitedRangeAngle a(45);
+    Angles::LimitedRangeAngle b(9);
+    EXPECT_THROW(a * b, Angles::RangeError);
   }
 
-  TEST(LimitedRangeAngle, OutOfRangeErrorMultiply) {
-    Angles::LimitedRangeAngle a(90);
-    Angles::LimitedRangeAngle b(5);
-    EXPECT_THROW(a*b, Angles::RangeError);
+  TEST(LimitedRangeAngle, OutOfRangeErrorInplaceMultiply) {
+    Angles::LimitedRangeAngle a(45);
+    Angles::LimitedRangeAngle b(9);
+    EXPECT_THROW(a *= b, Angles::RangeError);
   }
 
   // divide
@@ -557,19 +674,9 @@ namespace {
   }
 
   TEST(LimitedRangeAngle, InplaceDivideByZeroError) {
-    Angles::LimitedRangeAngle a(45);
-    Angles::LimitedRangeAngle b;
+    Angles::LimitedRangeAngle a(90);
+    Angles::LimitedRangeAngle b(0);
     EXPECT_THROW(a /= b, Angles::DivideByZeroError);
-  }
-
-  TEST(LimitedRangeAngle, InplaceDivideByZeroErrorMsg) {
-    try {
-      Angles::LimitedRangeAngle a(15);
-      Angles::LimitedRangeAngle b;
-      a /= b;
-    } catch (Angles::DivideByZeroError& err) {
-      EXPECT_STREQ(err.what(), "division by zero is undefined");
-    }
   }
 
   TEST(LimitedRangeAngle, DivideAngleByAngle) {
@@ -583,11 +690,10 @@ namespace {
   TEST(LimitedRangeAngle, OutOfRangeErrorDivide1) {
     Angles::LimitedRangeAngle a(90);
     Angles::LimitedRangeAngle b(0);
-    EXPECT_THROW(a/b, Angles::Error);
+    EXPECT_THROW(a/b, Angles::DivideByZeroError);
   }
 
   TEST(LimitedRangeAngle, OutOfRangeErrorDivide2) {
-    // expects LimitedRangeAngle constructor to declare it throws a RangeError
     Angles::LimitedRangeAngle a(90);
     Angles::LimitedRangeAngle b(0.01);
     EXPECT_THROW(a/b, Angles::RangeError);
@@ -597,299 +703,6 @@ namespace {
     Angles::LimitedRangeAngle a(90);
     Angles::LimitedRangeAngle b(0.01);
     EXPECT_THROW(a /= b, Angles::RangeError);
-  }
-
-
-  // TODO this goes away with angle class templates
-  TEST(LimitedRangeAngle, MismatchRangeError1) {
-    // TODO use templates to fix the range
-    Angles::LimitedRangeAngle a(90, 0, 0, 0, 360);
-    Angles::LimitedRangeAngle b(90, 0, 0, -90, 90);
-    EXPECT_THROW(a + b, Angles::RangeError);
-  }
-
-  TEST(LimitedRangeAngle, MismatchRangeError2) {
-    Angles::LimitedRangeAngle a(90, 0, 0, 0, 360);
-    Angles::LimitedRangeAngle b(90, 0, 0, -90, 90);
-    EXPECT_THROW(a += b, Angles::RangeError);
-  }
-
-  TEST(LimitedRangeAngle, MismatchRangeError3) {
-    // TODO use templates to fix the range
-    Angles::LimitedRangeAngle a(90, 0, 0, 0, 360);
-    Angles::LimitedRangeAngle b(90, 0, 0, -90, 90);
-    EXPECT_THROW(a - b, Angles::RangeError);
-  }
-
-  TEST(LimitedRangeAngle, MismatchRangeError4) {
-    Angles::LimitedRangeAngle a(90, 0, 0, 0, 360);
-    Angles::LimitedRangeAngle b(90, 0, 0, -90, 90);
-    EXPECT_THROW(a -= b, Angles::RangeError);
-  }
-
-  // -----------------------
-  // ----- Declination -----
-  // -----------------------
-
-  TEST(Declination, OutputOperator1) {
-    Angles::Declination a(-23, 26, 12.1);
-    std::stringstream out;
-    out << a;
-    EXPECT_STREQ("-23* 26' 12.1\"", out.str().c_str());
-  }
-
-  // constructors (and implicitly radians() accessor)
-
-  TEST(Declination, ConstructorDefault) {
-    Angles::Declination a;
-    EXPECT_EQ(0, a.radians());
-  }
-
-  TEST(Declination, ConstructorDeg) {
-    Angles::Declination a(45);
-    EXPECT_EQ(Angles::Angle::deg2rad(45), a.radians());
-  }
-
-  TEST(Declination, ConstructorDegStr) {
-    Angles::Declination a("45");
-    EXPECT_EQ(Angles::Angle::deg2rad(45), a.radians());
-  }
-
-
-  TEST(Declination, OutOfRangeError0) {
-    EXPECT_NO_THROW(Angles::Declination(-30));
-  }
-
-  TEST(Declination, OutOfRangeError1) {
-    EXPECT_THROW(Angles::Declination("-100"), Angles::RangeError);
-  }
-
-  TEST(Declination, OutOfRangeError2) {
-    EXPECT_THROW(Angles::Declination(90, 1), Angles::RangeError);
-  }
-
-  TEST(Declination, OutOfRangeError3) {
-    EXPECT_THROW(Angles::Declination("90", "1"), Angles::RangeError);
-  }
-
-  TEST(Declination, OutOfRangeError4) {
-    EXPECT_THROW(Angles::Declination("-90", "1"), Angles::RangeError);
-  }
-
-  // TODO bool operators
-
-
-
-  // arithmetic operators
-
-  // add
-  TEST(Declination, InplaceAddAngle) {
-    Angles::Declination a(45);
-    Angles::Declination b(45);
-    a += b;
-    EXPECT_DOUBLE_EQ(90, a.value());
-  }
-
-  TEST(Declination, OutOfRangeErrorInplaceAdd) {
-    Angles::Declination a(50);
-    Angles::Declination b(45);
-    EXPECT_THROW(a += b, Angles::RangeError);
-  }
-
-  TEST(Declination, AnglePlusAngle) {
-    Angles::Declination a(44.5);
-    Angles::Declination b(44.5);
-    Angles::Declination c;
-    c = a + b;
-    EXPECT_DOUBLE_EQ(89, c.value());
-  }
-
-  TEST(Declination, OutOfRangeErrorAdd) {
-    Angles::Declination a(50);
-    Angles::Declination b(45);
-    EXPECT_THROW(a + b, Angles::RangeError);
-  }
-
-  // subtract
-
-  TEST(Declination, InplaceSubtractAngle) {
-    Angles::Declination a(45);
-    Angles::Declination b(10);
-    a -= b;
-    EXPECT_DOUBLE_EQ(35, a.value());
-  }
-
-  TEST(Declination, OutOfRangeErrorInplaceSubtract) {
-    Angles::Declination a(-90);
-    Angles::Declination b(1);
-    EXPECT_THROW(a -= b, Angles::RangeError);
-  }
-
-  TEST(Declination, AngleMinusAngle) {
-    Angles::Declination a(45);
-    Angles::Declination b(45);
-    Angles::Declination c;
-    c = a - b;
-    EXPECT_DOUBLE_EQ(0, c.value());
-  }
-
-  TEST(Declination, OutOfRangeErrorSubtract) {
-    Angles::Declination a(-90);
-    Angles::Declination b(1);
-    EXPECT_THROW(a - b, Angles::RangeError);
-  }
-
-  // unitary minus
-
-  TEST(Declination, UnitaryMinus) {
-    Angles::Declination a;
-    Angles::Declination b(-45);
-    a = -b;
-    EXPECT_DOUBLE_EQ(45, a.value());
-  }
-
-  // multiply
-
-  TEST(Declination, OutOfRangeErrorMultiply) {
-    Angles::Declination a(45);
-    // TODO does not fail because of base class: Angles::Angle b(5);
-    Angles::Declination b(5);
-    EXPECT_THROW(a * b, Angles::RangeError);
-  }
-
-  TEST(Declination, OutOfRangeErrorInplaceMultiply) {
-    Angles::Declination a(45);
-    Angles::Declination b(5);
-    EXPECT_THROW(a *= b, Angles::RangeError);
-  }
-
-  // divide
-
-  TEST(Declination, InplaceDivide) {
-    Angles::Declination a(90);
-    Angles::Declination b(2);
-    a /= b;
-    EXPECT_DOUBLE_EQ(45, a.value());
-  }
-
-  TEST(Declination, InplaceDivideByZeroError) {
-    Angles::Declination a(90);
-    Angles::Declination b(0);
-    EXPECT_THROW(a /= b, Angles::Error);
-  }
-
-  TEST(Declination, DivideAngleByAngle) {
-    Angles::Declination a(90);
-    Angles::Declination b(2);
-    Angles::Declination c;
-    c = a / b;
-    EXPECT_DOUBLE_EQ(45, c.value());
-  }
-
-  TEST(Declination, OutOfRangeErrorDivide1) {
-    Angles::Declination a(90);
-    Angles::Declination b(0);
-    EXPECT_THROW(a/b, Angles::Error);
-  }
-
-  TEST(Declination, OutOfRangeErrorDivide2) {
-    // expects Declination constructor to declare it throws a RangeError
-    Angles::Declination a(90);
-    Angles::Declination b(0.01);
-    EXPECT_THROW(a/b, Angles::RangeError);
-  }
-
-  TEST(Declination, OutOfRangeErrorDivide3) {
-    Angles::Declination a(90);
-    Angles::Declination b(0.01);
-    EXPECT_THROW(a /= b, Angles::RangeError);
-  }
-
-
-
-
-
-
-
-  // --------------------
-  // ----- Latitude -----
-  // --------------------
-
-  TEST(Latitude, OutputOperator1) {
-    Angles::Latitude a(23, 26, 12.1);
-    std::stringstream out;
-    out << a;
-    EXPECT_STREQ("23* 26' 12.1\"", out.str().c_str());
-  }
-
-  // constructors (and implicitly radians() accessor)
-
-  TEST(Latitude, ConstructorDefault) {
-    Angles::Latitude a;
-    EXPECT_EQ(0, a.radians());
-  }
-
-
-  // ---------------------
-  // ----- Longitude -----
-  // ---------------------
-
-  TEST(Longitude, OutputOperator1) {
-    Angles::Longitude a(23, 26, 12.1);
-    std::stringstream out;
-    out << a;
-    EXPECT_STREQ("23* 26' 12.1\"", out.str().c_str());
-  }
-
-  // constructors (and implicitly radians() accessor)
-
-  TEST(Longitude, ConstructorDefault) {
-    Angles::Longitude a;
-    EXPECT_EQ(0, a.radians());
-  }
-
-
-  TEST(Longitude, OutOfRangeError1) {
-    EXPECT_THROW(Angles::Longitude("-190"), Angles::RangeError);
-  }
-
-  TEST(Longitude, OutOfRangeError2) {
-    EXPECT_THROW(Angles::Longitude(190, 1), Angles::RangeError);
-  }
-
-
-  // ---------------------------
-  // ----- Right Ascension -----
-  // ---------------------------
-
-  TEST(RightAscension, OutputOperator1) {
-    Angles::RA a(23, 26, 12.1);
-    std::stringstream out;
-    out << a;
-    EXPECT_STREQ("23 hr 26' 12.1\"", out.str().c_str());
-  }
-
-  TEST(RightAscension, OutOfRangeError1) {
-    EXPECT_THROW(Angles::RA("-10"), Angles::RangeError);
-  }
-
-  TEST(RightAscension, OutOfRangeError2) {
-    EXPECT_THROW(Angles::RA(24, 0, 0.1), Angles::RangeError);
-  }
-
-
-  // add
-  TEST(RightAscension, InplaceAddAngle) {
-    Angles::RA a(11, 59);
-    Angles::RA b("0", "0", "60");
-    a += b;
-    EXPECT_DOUBLE_EQ(12, a.value());
-  }
-
-  TEST(RightAscension, OutOfRangeErrorInplaceAdd) {
-    Angles::RA a(24, 0, 0);
-    Angles::RA b(0, 0, 0.01);
-    EXPECT_THROW(a += b, Angles::RangeError);
   }
 
 
@@ -924,6 +737,45 @@ namespace {
 
   TEST(Utils, Degree2SecondsError7) {
     EXPECT_TRUE(Angles::degrees2seconds(-45, 59, 60) == Angles::degrees2seconds(-45, -59, -60));
+  }
+
+
+
+  // opeartor<<()
+
+  TEST(LimitedRangeAngle, operatorStdOut) {
+    Angles::LimitedRangeAngle a(44, 32, 15.4);
+    std::stringstream out;
+    out << a;
+    EXPECT_STREQ("44* 32' 15.4\"", out.str().c_str());
+  }
+
+  TEST(Declination, operatorStdOut) {
+    Angles::Declination a(44, 32, 15.4);
+    std::stringstream out;
+    out << a;
+    EXPECT_STREQ("44* 32' 15.4\"", out.str().c_str());
+  }
+
+  TEST(Latitude, operatorStdOut) {
+    Angles::Latitude a(-53, 42, 23.6);
+    std::stringstream out;
+    out << a;
+    EXPECT_STREQ("-53* 42' 23.6\"", out.str().c_str());
+  }
+
+  TEST(Longitude, operatorStdOut) {
+    Angles::Longitude a(100, 17, 45.8);
+    std::stringstream out;
+    out << a;
+    EXPECT_STREQ("100* 17' 45.8\"", out.str().c_str());
+  }
+
+  TEST(RA, operatorStdOut) {
+    Angles::RA a(16, 30, 15);
+    std::stringstream out;
+    out << a;
+    EXPECT_STREQ("16:30:15", out.str().c_str());
   }
 
 

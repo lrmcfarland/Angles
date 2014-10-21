@@ -32,19 +32,13 @@
 
 Angles::Angle::Angle(const double& a_deg_or_hr,
 		     const double& a_min,
-		     const double& a_sec,
-		     const double& a_minimum,
-		     const double& a_maximum)
-  : m_minimum(a_minimum), m_maximum(a_maximum) {
+		     const double& a_sec) {
   value(degrees2seconds(a_deg_or_hr, a_min, a_sec)/3600.0);
 }
 
 Angles::Angle::Angle(const std::string& a_deg_or_hr,
 		     const std::string& a_min,
-		     const std::string& a_sec,
-		     const double& a_minimum,
-		     const double& a_maximum)
-  : m_minimum(a_minimum), m_maximum(a_maximum) {
+		     const std::string& a_sec) {
   value(Angle(Angles::stod(a_deg_or_hr),
 	      Angles::stod(a_min),
 	      Angles::stod(a_sec)).value());
@@ -69,7 +63,7 @@ Angles::Angle& Angles::Angle::operator*=(const Angle& rhs) {
   return *this;
 }
 
-Angles::Angle& Angles::Angle::operator/=(const Angle& rhs) throw (DivideByZeroError, RangeError) {
+Angles::Angle& Angles::Angle::operator/=(const Angle& rhs) throw (DivideByZeroError) {
   // LimitedRangeAngle can also raise RangeError
   if (rhs.value() == 0)
     throw DivideByZeroError();
@@ -130,285 +124,10 @@ void Angles::Angle::normalize() {
 }
 
 
-// =============================
-// ===== LimitedRangeAngle =====
-// =============================
 
-// ----- constructor from string for building from xml ----
 
-Angles::LimitedRangeAngle::LimitedRangeAngle(const double& a_deg_or_hr,
-					     const double& a_min,
-					     const double& a_sec,
-					     const double& a_minimum,
-					     const double& a_maximum) throw(RangeError)
-  : Angle(a_deg_or_hr, a_min, a_sec, a_minimum, a_maximum) {
 
-  if (value() < minimum())
-      throw RangeError("minimum exceeded");
 
-  if (value() > maximum())
-      throw RangeError("maximum exceeded");
 
-  value(value());
-}
-
-Angles::LimitedRangeAngle::LimitedRangeAngle(const std::string& a_deg_or_hr,
-					     const std::string& a_min,
-					     const std::string& a_sec,
-					     const double& a_minimum,
-					     const double& a_maximum) throw(RangeError)
-  : Angle(a_deg_or_hr, a_min, a_sec, a_minimum, a_maximum) {
-  value(LimitedRangeAngle(Angles::stod(a_deg_or_hr),
-			  Angles::stod(a_min),
-			  Angles::stod(a_sec),
-			  a_minimum,
-			  a_maximum).value());
-  // TODO bad string exception with C++11 stod
-  // TODO delegating constructors in C++11
-}
-
-
-// ----- inplace operators -----
-
-Angles::LimitedRangeAngle& Angles::LimitedRangeAngle::operator+=(const LimitedRangeAngle& rhs)
-  throw (RangeError) {
-
-  if (minimum() != rhs.minimum())
-    throw RangeError("range minimums are not equal");
-
-  if (maximum() != rhs.maximum())
-    throw RangeError("range maximums are not equal");
-
-  double temp(value() + rhs.value());
-
-  if (temp < minimum())
-    throw RangeError("minimum exceeded");
-
-  if (temp > maximum())
-    throw RangeError("maximum exceeded");
-
-  value(temp);
-
-  return *this;
-}
-
-Angles::LimitedRangeAngle& Angles::LimitedRangeAngle::operator-=(const LimitedRangeAngle& rhs)
-  throw (RangeError) {
-
-  if (minimum() != rhs.minimum())
-    throw RangeError("range minimums are not equal");
-
-  if (maximum() != rhs.maximum())
-    throw RangeError("range maximums are not equal");
-
-  double temp(value() - rhs.value());
-
-  if (temp < minimum())
-    throw RangeError("minimum exceeded");
-
-  if (temp > maximum())
-    throw RangeError("maximum exceeded");
-
-  value(temp);
-
-  return *this;
-}
-
-Angles::LimitedRangeAngle& Angles::LimitedRangeAngle::operator*=(const Angles::LimitedRangeAngle& rhs)
-  throw (RangeError) {
-
-  double temp(value() * rhs.value());
-
-  if (temp < minimum())
-    throw RangeError("minimum exceeded");
-
-  if (temp > maximum())
-    throw RangeError("maximum exceeded");
-
-  value(temp);
-
-  return *this;
-}
-
-Angles::LimitedRangeAngle& Angles::LimitedRangeAngle::operator/=(const Angles::LimitedRangeAngle& rhs)
-  throw (DivideByZeroError, RangeError) {
-
-  if (rhs.value() == 0)
-    throw DivideByZeroError();
-
-  double temp(value() / rhs.value());
-
-  if (temp < minimum())
-    throw RangeError("minimum exceeded");
-
-  if (temp > maximum())
-    throw RangeError("maximum exceeded");
-
-  value(temp);
-
-  return *this;
-}
-
-// =======================
-// ===== Declination =====
-// =======================
-
-
-// ----- constructor from string for building from xml ----
-
-Angles::Declination::Declination(const double& a_deg,
-				 const double& a_min,
-				 const double& a_sec,
-				 const double& a_minimum,
-				 const double& a_maximum) throw(RangeError)
-  : LimitedRangeAngle(a_deg, a_min, a_sec, a_minimum, a_maximum) {
-  // TODO delegating constructors in C++11
-}
-
-Angles::Declination::Declination(const std::string& a_deg,
-				 const std::string& a_min,
-				 const std::string& a_sec,
-				 const double& a_minimum,
-				 const double& a_maximum) throw(RangeError)
-  : LimitedRangeAngle(a_deg, a_min, a_sec, a_minimum, a_maximum) {
-  // TODO delegating constructors in C++11
-}
-
-
-// ----- inplace operators -----
-
-Angles::Declination& Angles::Declination::operator+=(const Declination& rhs)
-  throw (RangeError) {
-
-  if (minimum() != rhs.minimum())
-    throw RangeError("range minimums are not equal");
-
-  if (maximum() != rhs.maximum())
-    throw RangeError("range maximums are not equal");
-
-  double temp(value() + rhs.value());
-
-  if (temp < minimum())
-    throw RangeError("minimum exceeded");
-
-  if (temp > maximum())
-    throw RangeError("maximum exceeded");
-
-  value(temp);
-
-  return *this;
-}
-
-Angles::Declination& Angles::Declination::operator-=(const Declination& rhs)
-  throw (RangeError) {
-
-  if (minimum() != rhs.minimum())
-    throw RangeError("range minimums are not equal");
-
-  if (maximum() != rhs.maximum())
-    throw RangeError("range maximums are not equal");
-
-  double temp(value() - rhs.value());
-
-  if (temp < minimum())
-    throw RangeError("minimum exceeded");
-
-  if (temp > maximum())
-    throw RangeError("maximum exceeded");
-
-  value(temp);
-
-  return *this;
-}
-
-Angles::Declination& Angles::Declination::operator*=(const Angles::Declination& rhs)
-  throw (RangeError) {
-
-  double temp(value() * rhs.value());
-
-  if (temp < minimum())
-    throw RangeError("minimum exceeded");
-
-  if (temp > maximum())
-    throw RangeError("maximum exceeded");
-
-  value(temp);
-
-  return *this;
-}
-
-Angles::Declination& Angles::Declination::operator/=(const Angles::Declination& rhs)
-  throw (DivideByZeroError, RangeError) {
-
-  if (rhs.value() == 0)
-    throw DivideByZeroError();
-
-  double temp(value() / rhs.value());
-
-  if (temp < minimum())
-    throw RangeError("minimum exceeded");
-
-  if (temp > maximum())
-    throw RangeError("maximum exceeded");
-
-  value(temp);
-
-  return *this;
-}
-
-
-// =====================
-// ===== Longitude =====
-// =====================
-
-
-// ----- constructor from string for building from xml ----
-
-Angles::Longitude::Longitude(const double& a_deg,
-			     const double& a_min,
-			     const double& a_sec,
-			     const double& a_minimum,
-			     const double& a_maximum) throw(RangeError)
-  : LimitedRangeAngle(a_deg, a_min, a_sec, a_minimum, a_maximum) {
-  // TODO delegating constructors in C++11
-}
-
-Angles::Longitude::Longitude(const std::string& a_deg,
-			     const std::string& a_min,
-			     const std::string& a_sec,
-			     const double& a_minimum,
-			     const double& a_maximum) throw(RangeError)
-  : LimitedRangeAngle(a_deg, a_min, a_sec, a_minimum, a_maximum) {
-  // TODO delegating constructors in C++11
-}
-
-// ===========================
-// ===== Right Ascension =====
-// ===========================
-
-
-// ----- constructor from string for building from xml ----
-
-Angles::RA::RA(const double& a_hour,
-	       const double& a_min,
-	       const double& a_sec,
-	       const double& a_minimum,
-	       const double& a_maximum) throw(RangeError)
-  : LimitedRangeAngle(a_hour, a_min, a_sec, a_minimum, a_maximum) {
-
-  // TODO delegating constructors in C++11
-
-}
-
-Angles::RA::RA(const std::string& a_hour,
-	       const std::string& a_min,
-	       const std::string& a_sec,
-	       const double& a_minimum,
-	       const double& a_maximum) throw(RangeError)
-  : LimitedRangeAngle(a_hour, a_min, a_sec, a_minimum, a_maximum) {
-
-  // TODO delegating constructors in C++11
-
-}
 
 
