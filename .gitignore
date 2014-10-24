@@ -22,6 +22,9 @@ libAngles/angles_unittest
 
 # builds
 python/Boost/build
+python/Boost/angles.cpp
+python/Boost/test_angles.py
+
 python/Manual/build
 
 python/Swig/_angles.so

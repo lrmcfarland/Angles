@@ -6,18 +6,26 @@
 # ===============================================================
 
 OSXFLAGS = env ARCHFLAGS="-arch x86_64"
+RM       = rm -rf
 
 all: build
 
-build: setup.py boost_angle_module.cpp
+build: setup.py angles.cpp
 	${OSXFLAGS} python setup.py build
+
+angles.cpp: gen_angles_module.py
+	./gen_angles_module.py
 
 test: build test_angles.py
 	./test_angles.sh -v
 
-clean:
-	rm -rf build
+test_angles.py: gen_test_angles.py
+	./gen_test_angles.py
 
-clobber:
-	rm -rf build
-	rm *~
+clean:
+	-$(RM) angles.cpp
+	-$(RM) test_angles.py
+	-$(RM) build
+
+clobber: clean
+	-$(RM) *~
