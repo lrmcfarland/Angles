@@ -26,6 +26,8 @@ python/Boost/angles.cpp
 python/Boost/test_angles.py
 
 python/Manual/build
+python/Manual/angles.cpp
+python/Manual/test_angles.py
 
 python/Swig/_angles.so
 python/Swig/angles.py
