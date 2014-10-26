@@ -319,7 +319,7 @@ static PyObject* %(TypeName)s_nb_divide(PyObject* o1, PyObject* o2) {
   new_%(TypeName)sType(&result_angle);
 
   if (result_angle == NULL) {
-    PyErr_SetString(sAngleException, "multiply failed to create angle");
+    PyErr_SetString(sAngleException, "divide failed to create angle");
     return NULL;
   }
 
@@ -814,7 +814,7 @@ static PyObject* %(TypeName)s_nb_divide(PyObject* o1, PyObject* o2) {
   new_%(TypeName)sType(&result_angle);
 
   if (result_angle == NULL) {
-    PyErr_SetString(sAngleException, "multiply failed to create angle");
+    PyErr_SetString(sAngleException, "divide failed to create angle");
     return NULL;
   }
 
