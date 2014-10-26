@@ -20,7 +20,7 @@ addition.
 I wrap these in Python by both [manually
 extending](https://docs.python.org/2/extending/extending.html) angles
 and using [Boost](http://www.boost.org) wrappers.
-[SWIG](http://www.swig.org) is next.
+[SWIG](http://www.swig.org) and [Cython](http://cython.org) are next.
 
 Sets of unit tests verify the C++ library and Python modules work
 as expected.
