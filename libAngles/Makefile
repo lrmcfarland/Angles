@@ -64,7 +64,6 @@ $(TARGET_D): $(OBJECTS) $(INCLUDES) $(SOURCES)
 	-$(LN) $(TARGET_D) $(TARGET_D2)
 
 
-
 test: angles_unittest
 	./angles_unittest
 
@@ -74,11 +73,14 @@ angles_unittest: angles_unittest.o $(TARGET_D)
 angles_unittest.o: angles_unittest.cpp
 	g++ -I$(GTEST_DIR)/include -I . -g -c angles_unittest.cpp
 
-
+example1: example1.o $(TARGET_D)
+	g++ example1.o -o example1 -L. -lAngles
 
 clean:
 	-$(RM) angles_unittest
 	-$(RM) angles_unittest.o
+	-$(RM) example1
+	-$(RM) example1.o
 	-$(RM) $(OBJECTS)
 	-$(RM) $(TARGET_D0) $(TARGET_D1) $(TARGET_D2)
 	-$(RM) $(TARGET_D)

@@ -19,6 +19,7 @@
 
 # executables
 libAngles/angles_unittest
+libAngles/example1
 
 # builds
 python/Boost/build
