@@ -22,7 +22,7 @@ extending](https://docs.python.org/2/extending/extending.html) angles
 and using [Boost](http://www.boost.org) wrappers.
 [SWIG](http://www.swig.org) is next.
 
-Sets of unit test verify the C++ library and Python modules work
+Sets of unit tests verify the C++ library and Python modules work
 as expected.
 
 ## Build
