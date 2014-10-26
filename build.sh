@@ -4,8 +4,7 @@
 # order, i.e. libs before pys.
 
 libs="./libAngles"
-# TODO pys="./python/Manual ./python/Boost ./python/SWIG"
-pys="./python/Boost"
+pys="./python/Manual ./python/Boost" # TODO ./python/SWIG"
 
 # ---------------------
 # ----- Utilities -----

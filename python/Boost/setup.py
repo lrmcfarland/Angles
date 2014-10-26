@@ -19,7 +19,7 @@ library_dirs=['../../libAngles',
 
 libraries = ['boost_python', 'Angles']
 
-sources = ['boost_angle_module.cpp']
+sources = ['angles.cpp']
 
 angle_module = Extension(name,
                          include_dirs=include_dirs,

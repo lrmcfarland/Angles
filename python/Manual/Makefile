@@ -1,8 +1,8 @@
 # ===============================================================
 # Filename:    Makefile
-# Description: Makefile to run build, test commands
+# Description: makefile to run build, test commands
 # Author:      L.R. McFarland
-# Created:     2014sep29
+# Created:     2014 oct 10
 # ===============================================================
 
 OSXFLAGS = env ARCHFLAGS="-arch x86_64"
@@ -10,7 +10,8 @@ RM       = rm -rf
 
 all: build
 
-build: setup.py angles.cpp
+build: gen_angles_module.py angles.cpp setup.py
+	./gen_angles_module.py
 	${OSXFLAGS} python setup.py build
 
 angles.cpp: gen_angles_module.py

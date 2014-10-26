@@ -24,6 +24,20 @@
 //  along with Orbits.  If not, see <http://www.gnu.org/licenses/>.
 // ================================================================
 
+
+// Notes: I had originaly had angles */ doubles, doubles */ angles and
+// could overload the operators directly, but when I tired to make
+// templates of this, I got a compile "error: overloaded 'operator*'
+// must have at least one parameter of class or enumeration type"
+// I decided it was apples and oranges anyway and removed it.
+//
+// Angles "specialized" to ignore range, but Angles *
+// LimitedRangeAngle returns an Angle even if it is out of range.
+//
+// Angles has min/max but does not use them. LimitedRangeAngles
+// assumes the template sets them the same for all instances.
+
+
 #pragma once
 
 #include <cmath>
@@ -31,6 +45,8 @@
 #include <stdexcept>
 
 #include <utils.h>
+
+
 
 namespace Angles {
 
@@ -61,7 +77,7 @@ namespace Angles {
     inline Angle(const Angle& a);
     inline Angle& operator=(const Angle& rhs);
 
-    // ----- accessor -----
+    // ----- accessors -----
     void          value(const double& a_value) {m_value = a_value;}
     const double& value() const                {return m_value;}
     double        getValue() const             {return m_value;} // for boost
@@ -70,7 +86,7 @@ namespace Angles {
     virtual double radians() const                {return deg2rad(value());}
     double         getRadians() const             {return deg2rad(value());} // for boost
 
-    // ----- bool operators -----
+    // ----- boolean operators -----
 
     inline bool operator== (const Angle& rhs) const;
     inline bool operator!= (const Angle& rhs) const;
@@ -81,13 +97,14 @@ namespace Angles {
     inline bool operator> (const Angle& rhs) const;
     inline bool operator>= (const Angle& rhs) const;
 
-    // ----- inplace operators -----
+    // ----- in-place operators -----
 
     virtual Angle& operator+=(const Angle& rhs);
     virtual Angle& operator-=(const Angle& rhs);
 
-    virtual Angle& operator*=(const double& rhs);
-    virtual Angle& operator/=(const double& rhs) throw (Error);
+    virtual Angle& operator*=(const Angle& rhs);
+    virtual Angle& operator/=(const Angle& rhs) throw (DivideByZeroError);
+
 
     // ----- other methods -----
     virtual void normalize();  // TODO normalized -> return a new copy?
@@ -103,7 +120,7 @@ namespace Angles {
   // copy constructor
   inline Angle::Angle(const Angle& a) {
     m_value = a.value();
-  };
+  }
 
   // copy assignment
   inline Angle& Angle::operator=(const Angle& rhs) {
@@ -146,225 +163,392 @@ namespace Angles {
   Angle operator- (const Angle& lhs, const Angle& rhs);
   Angle operator- (const Angle& rhs); // unitary minus
 
-  Angle operator* (const Angle& lhs, const double& rhs);
-  Angle operator* (const double& lhs, const Angle& rhs);
+  Angle operator* (const Angle& lhs, const Angle& rhs);
+  Angle operator/ (const Angle& lhs, const Angle& rhs) throw (DivideByZeroError);
 
-  Angle operator/ (const Angle& lhs, const double& rhs) throw (Error);
-  Angle operator/ (const double& lhs, const Angle& rhs) throw (Error);
+  
+  std::ostream& operator<< (std::ostream& os, const Angles::Angle& a) {
+
+    bool isNegative(false);
+
+    if (a.value() < 0)
+      isNegative = true;
+
+    double degrees = fabs(a.value());
+    double minutes = 60 * (degrees - floor(degrees));
+    double seconds = 60 * (minutes - floor(minutes));
+
+    if (isNegative)
+      degrees = -1 * floor(degrees);
+    else
+      degrees = floor(degrees);
+
+    os << degrees << "* " << floor(minutes) << "\' " << seconds << "\"";
+
+    return os;
+  }
+
 
   // =============================
   // ===== LimitedRangeAngle =====
   // =============================
 
-  class LimitedRangeAngle : public Angle {
-    // enforces range limits on angles, e.g. longitude -180 to 180,
-    // declination and latitude -90 to 90
+
+  template<int A_MINIMUM, int A_MAXIMUM>  // only ints can be non-type arguments
+    class LRA {
 
   public:
 
-    // ----- ctor and dtor -----
+    // angle unit convertors
+    static double deg2rad(const double& deg) {return deg*M_PI/180.0;}
+    static double rad2deg(const double& rad) {return rad*180.0/M_PI;}
 
-    explicit LimitedRangeAngle(const double& a_deg = 0.0,
-			       const double& a_min = 0.0,
-			       const double& a_sec = 0.0,
-			       const double& a_minimum = 0.0,
-			       const double& a_maximum = 360) throw (RangeError);
 
-    explicit LimitedRangeAngle(const std::string& a_deg, // The ambiguity is in the box.
-			       const std::string& a_min = "0",
-			       const std::string& a_sec = "0",
-			       const double& a_minimum = 0.0,
-			       const double& a_maximum = 360) throw (RangeError);
+    explicit LRA(const double& a_deg = 0.0,
+		 const double& a_min = 0.0,
+		 const double& a_sec = 0.0) throw (RangeError);
 
-    virtual ~LimitedRangeAngle() {};
+    explicit LRA(const std::string& a_deg, // The ambiguity is in the box.
+		 const std::string& a_min = "0.0",
+		 const std::string& a_sec = "0.0") throw (RangeError);
 
-    inline LimitedRangeAngle(const LimitedRangeAngle& a);
-    inline LimitedRangeAngle& operator=(const LimitedRangeAngle& rhs);
+    LRA(const LRA& a);
+
+    LRA& operator=(const LRA& rhs);
+
+    ~LRA() {};
+
 
     // ----- accessors -----
+    void          value(const double& a_value) {m_value = a_value;}
+    const double& value() const                {return m_value;}
+    double        getValue() const             {return m_value;} // for boost
+
+    void          radians(const double& a_value) {value(rad2deg(a_value));}
+    double        radians() const                {return deg2rad(value());}
+    double        getRadians() const             {return deg2rad(value());} // for boost
+
     const double& minimum() const {return m_minimum;}
     double        getMinimum() const {return m_minimum;} // for boost
 
     const double& maximum() const {return m_maximum;}
     double        getMaximum() const {return m_maximum;} // for boost
 
+    // ----- boolean operators -----
 
-    // ----- inplace operators -----
+    bool operator== (const LRA& rhs) const;
+    bool operator!= (const LRA& rhs) const;
 
-    virtual LimitedRangeAngle& operator+=(const LimitedRangeAngle& rhs) throw (RangeError);
-    virtual LimitedRangeAngle& operator-=(const LimitedRangeAngle& rhs) throw (RangeError);
+    bool operator< (const LRA& rhs) const;
+    bool operator<= (const LRA& rhs) const;
 
-    virtual LimitedRangeAngle& operator*=(const double& rhs) throw (RangeError);
-    virtual LimitedRangeAngle& operator/=(const double& rhs) throw (DivideByZeroError, RangeError);
+    bool operator> (const LRA& rhs) const;
+    bool operator>= (const LRA& rhs) const;
+
+
+    // ----- in-place operators -----
+
+    LRA& operator+=(const LRA& rhs) throw (RangeError);
+    LRA& operator-=(const LRA& rhs) throw (RangeError);
+
+    LRA& operator*=(const LRA& rhs) throw (RangeError);
+    LRA& operator/=(const LRA& rhs) throw (DivideByZeroError, RangeError);
+
+    // ----- helpers -----
+    void validRange(const double& a_value) const throw (RangeError);
 
   private:
 
-    double m_minimum;
+    double m_value; // degrees for declination, latitude, longitude, seconds for right ascension
+
+    double m_minimum; // TODO const with copy constructor possible?
     double m_maximum;
 
   };
 
-  // ----- inline implementations of angle methods -----
+  // constructor from doubles
+  template<int A_MINIMUM, int A_MAXIMUM>  // only ints can be non-type arguments
+    LRA<A_MINIMUM, A_MAXIMUM>::LRA(const double& a_deg,
+				   const double& a_min,
+				   const double& a_sec) throw (RangeError)
+    : m_minimum(A_MINIMUM), m_maximum(A_MAXIMUM)
+  {
+    double temp(degrees2seconds(a_deg, a_min, a_sec)/3600.0);
 
-  // copy constructor
-  inline LimitedRangeAngle::LimitedRangeAngle(const LimitedRangeAngle& a) {
-    value(a.value());
-    m_minimum = a.minimum();
-    m_maximum = a.maximum();
+    if (temp < minimum())
+      throw RangeError("minimum exceeded");
+
+    if (temp > maximum())
+      throw RangeError("maximum exceeded");
+
+    value(temp);
+
   };
 
-  // copy assignment
-  inline LimitedRangeAngle& LimitedRangeAngle::operator=(const LimitedRangeAngle& rhs) {
+  // constructor from strings
+  template<int A_MINIMUM, int A_MAXIMUM>  // only ints can be non-type arguments
+    LRA<A_MINIMUM, A_MAXIMUM>::LRA(const std::string& a_deg,
+				   const std::string& a_min,
+				   const std::string& a_sec) throw (RangeError)
+    : m_minimum(A_MINIMUM), m_maximum(A_MAXIMUM)
+  {
+
+    // TODO bad string exception with C++11 stod
+    // TODO delegating constructors in C++11
+
+    double temp(degrees2seconds(Angles::stod(a_deg),
+				Angles::stod(a_min),
+				Angles::stod(a_sec))/3600.0);
+
+    if (temp < minimum())
+      throw RangeError("minimum exceeded");
+
+    if (temp > maximum())
+      throw RangeError("maximum exceeded");
+
+    value(temp);
+
+  };
+
+  // copy constructor
+  template<int A_MINIMUM, int A_MAXIMUM>
+    LRA<A_MINIMUM, A_MAXIMUM>::LRA(const LRA& a) {
+    m_value = a.value();
+    m_minimum = a.minimum();
+    m_maximum = a.maximum();
+  }
+
+  // copy assign
+  template<int A_MINIMUM, int A_MAXIMUM>
+    LRA<A_MINIMUM, A_MAXIMUM>& LRA<A_MINIMUM, A_MAXIMUM>::operator=(const LRA& rhs) {
     if (this == &rhs) return *this;
-    value(rhs.value());
+    m_value = rhs.value();
     m_minimum = rhs.minimum();
     m_maximum = rhs.maximum();
     return *this;
   }
 
-  // ---------------------------------------
-  // ----- LimitedRangeAngle operators -----
-  // ---------------------------------------
+  // booleans
 
-  LimitedRangeAngle operator+ (const LimitedRangeAngle& lhs, const LimitedRangeAngle& rhs) throw (RangeError);
-  LimitedRangeAngle operator- (const LimitedRangeAngle& lhs, const LimitedRangeAngle& rhs) throw (RangeError);
+  template<int A_MINIMUM, int A_MAXIMUM>
+    bool LRA<A_MINIMUM, A_MAXIMUM>::operator== (const LRA& rhs) const {
+    return m_value == rhs.value();
+  }
 
-  // TODO unitary minus
+  template<int A_MINIMUM, int A_MAXIMUM>
+    bool LRA<A_MINIMUM, A_MAXIMUM>::operator!= (const LRA& rhs) const {
+    return !operator==(rhs);
+  }
 
-  LimitedRangeAngle operator* (const LimitedRangeAngle& lhs, const double& rhs) throw (RangeError);
-  LimitedRangeAngle operator* (const double& lhs, const LimitedRangeAngle& rhs) throw (RangeError);
+  template<int A_MINIMUM, int A_MAXIMUM>
+    bool LRA<A_MINIMUM, A_MAXIMUM>::operator< (const LRA& rhs) const {
+    return m_value < rhs.value();
+  }
 
-  LimitedRangeAngle operator/ (const LimitedRangeAngle& lhs, const double& rhs)
-    throw (DivideByZeroError, RangeError);
+  template<int A_MINIMUM, int A_MAXIMUM>
+    bool LRA<A_MINIMUM, A_MAXIMUM>::operator<= (const LRA& rhs) const {
+    return m_value <= rhs.value();
+  }
 
-  // =============================
-  // ===== Declination Angle =====
-  // =============================
+  template<int A_MINIMUM, int A_MAXIMUM>
+    bool LRA<A_MINIMUM, A_MAXIMUM>::operator> (const LRA& rhs) const {
+    return m_value > rhs.value();
+  }
 
-  class Declination : public LimitedRangeAngle {
-
-  public:
-
-    // ----- ctor and dtor -----
-
-    explicit Declination(const double& a_deg = 0.0,
-			 const double& a_min = 0.0,
-			 const double& a_sec = 0.0,
-			 const double& a_minimum = -90.0,
-			 const double& a_maximum =  90.0) throw (RangeError);
-
-    explicit Declination(const std::string& a_deg, // The ambiguity is in the box.
-			 const std::string& a_min = "0",
-			 const std::string& a_sec = "0",
-			 const double& a_minimum = -90.0,
-			 const double& a_maximum =  90.0) throw (RangeError);
-
-    virtual ~Declination() {};
-
-  };
-
-  // ====================
-  // ===== Latitude =====
-  // ====================
-
-  typedef Declination Latitude;
-
-  // =====================
-  // ===== Longitude =====
-  // =====================
-
-  class Longitude : public LimitedRangeAngle {
-
-  public:
-
-    // ----- ctor and dtor -----
-
-    explicit Longitude(const double& a_deg = 0.0,
-		       const double& a_min = 0.0,
-		       const double& a_sec = 0.0,
-		       const double& a_minimum = -180.0,
-		       const double& a_maximum =  180.0) throw (RangeError);
-
-    explicit Longitude(const std::string& a_deg, // The ambiguity is in the box.
-		       const std::string& a_min = "0",
-		       const std::string& a_sec = "0",
-		       const double& a_minimum = -180.0,
-		       const double& a_maximum =  180.0) throw (RangeError);
-
-    virtual ~Longitude() {};
-
-  };
-
-  // ===========================
-  // ===== Right Ascension =====
-  // ===========================
-
-  class RA : public LimitedRangeAngle {
-
-  public:
-
-    // ----- ctor and dtor -----
-
-    explicit RA(const double& a_hour = 0.0,
-		const double& a_min = 0.0,
-		const double& a_sec = 0.0,
-		const double& a_minimum =  0.0,
-		const double& a_maximum = 24.0) throw (RangeError);
-
-    explicit RA(const std::string& a_hour, // The ambiguity is in the box.
-		const std::string& a_min = "0",
-		const std::string& a_sec = "0",
-		const double& a_minimum =  0.0,
-		const double& a_maximum = 24.0) throw (RangeError);
-
-    virtual ~RA() {};
-
-  };
+  template<int A_MINIMUM, int A_MAXIMUM>
+    bool LRA<A_MINIMUM, A_MAXIMUM>::operator>= (const LRA& rhs) const {
+    return m_value >= rhs.value();
+  }
 
 
+  // in-place arithmetic operator method templates
 
-// ================================
-// ===== operator<< functions =====
-// ================================
+  // validRange
+  template<int A_MINIMUM, int A_MAXIMUM>
+    void LRA<A_MINIMUM, A_MAXIMUM>::validRange(const double& a_value) const throw (RangeError) {
+    // ASSUMES: range limits are equal for both sides, enforced by the
+    // template construction.
+    if (a_value < minimum())
+      throw RangeError("minimum exceeded");
+    if (a_value > maximum())
+      throw RangeError("maximum exceeded");
+  }
 
-// operator<< for declination, latitude, longitude
+  // add
+  template<int A_MINIMUM, int A_MAXIMUM>
+    LRA<A_MINIMUM, A_MAXIMUM>& LRA<A_MINIMUM, A_MAXIMUM>::operator+=(const LRA& rhs)
+    throw (RangeError) {
+    double temp(value() + rhs.value());
+    validRange(temp);
+    value(temp);
+    return *this;
+  }
 
-// inline for boost templates
+  // subtract
+  template<int A_MINIMUM, int A_MAXIMUM>
+    LRA<A_MINIMUM, A_MAXIMUM>& LRA<A_MINIMUM, A_MAXIMUM>::operator-=(const LRA& rhs)
+    throw (RangeError) {
+    double temp(value() - rhs.value());
+    validRange(temp);
+    value(temp);
+    return *this;
+  }
 
-inline std::ostream& operator<< (std::ostream& os, const Angles::Angle& a) {
 
-  bool isNegative(false);
+  // multiply
+  template<int A_MINIMUM, int A_MAXIMUM>
+    LRA<A_MINIMUM, A_MAXIMUM>& LRA<A_MINIMUM, A_MAXIMUM>::operator*=(const LRA& rhs)
+    throw (RangeError) {
+    double temp(value() * rhs.value());
+    validRange(temp);
+    value(temp);
+    return *this;
+  }
 
-  if (a.value() < 0)
-    isNegative = true;
 
-  double degrees = fabs(a.value());
-  double minutes = 60 * (degrees - floor(degrees));
-  double seconds = 60 * (minutes - floor(minutes));
+  // divide
+  template<int A_MINIMUM, int A_MAXIMUM>
+    LRA<A_MINIMUM, A_MAXIMUM>& LRA<A_MINIMUM, A_MAXIMUM>::operator/=(const LRA& rhs)
+    throw (DivideByZeroError, RangeError) {
+    if (rhs.value() == 0)
+      throw DivideByZeroError();
+    double temp(value() / rhs.value());
+    validRange(temp);
+    value(temp);
+    return *this;
+  }
 
-  if (isNegative)
-    degrees = -1 * floor(degrees);
-  else
-    degrees = floor(degrees);
+ // arithmetic operator function templates
 
-  os << degrees << "* " << floor(minutes) << "\' " << seconds << "\"";
+  // add
+  template <typename T>
+    T operator+(const T& lhs, const T& rhs) throw (RangeError) {
+    double temp(lhs.value() + rhs.value());
+    lhs.validRange(temp);
+    return T(temp);
+  }
 
-  return os;
-}
+  // subtract
+  template <typename T>
+    T operator-(const T& lhs, const T& rhs) throw (RangeError) {
+    double temp(lhs.value() - rhs.value());
+    lhs.validRange(temp);
+    return T(temp);
+  }
 
-// operator<< right ascension
+  // unitary minus
+  template <typename T>
+    T operator-(const T& rhs) throw(RangeError) {
+    double temp(-rhs.value());
+    rhs.validRange(temp);
+    return T(temp);
+  }
 
-inline std::ostream& operator<< (std::ostream& os, const Angles::RA& a) {
-  // constructor ensures a is not negative.
-  double hours = fabs(a.value());
-  double minutes = 60 * (hours - floor(hours));
-  double seconds = 60 * (minutes - floor(minutes));
+  // multiply
+  template <typename T>
+    T operator*(const T& lhs, const T& rhs) throw (RangeError) {
+    double temp(lhs.value() * rhs.value());
+    lhs.validRange(temp);
+    return T(temp);
+  }
 
-  os << floor(hours) << " hr " << floor(minutes) << "\' " << seconds << "\"";
+  // divide
+  template <typename T>
+    T operator/(const T& lhs, const T& rhs) throw (DivideByZeroError, RangeError) {
+    if (rhs.value() == 0)
+      throw DivideByZeroError();
+    double temp(lhs.value() / rhs.value());
+    lhs.validRange(temp);
+    return T(temp);
+  }
 
-  return os;
-}
+
+  // ================================
+  // ===== typedef-ed instances =====
+  // ================================
+
+
+  typedef LRA<-360, 360> LimitedRangeAngle;
+
+  typedef LRA<-90, 90>   Declination;
+  typedef LRA<-90, 90>   Latitude;
+  typedef LRA<-180, 180> Longitude;
+  typedef LRA<0, 24>     RA; // Right Ascension
+
+
+
+  // operator<<
+
+  void value2DMSString(const double& a_value, std::stringstream& a_string) {
+
+    bool isNegative(false);
+
+    if (a_value < 0)
+      isNegative = true;
+
+    double degrees = fabs(a_value);
+    double minutes = 60 * (degrees - floor(degrees));
+    double seconds = 60 * (minutes - floor(minutes));
+
+    if (isNegative)
+      degrees = -1 * floor(degrees);
+    else
+      degrees = floor(degrees);
+
+    a_string << degrees << "* " << floor(minutes) << "\' " << seconds << "\"";
+
+  }
+
+  void value2HMSString(const double& a_value, std::stringstream& a_string) {
+
+    bool isNegative(false);
+
+    if (a_value < 0)
+      isNegative = true;
+
+    double degrees = fabs(a_value);
+    double minutes = 60 * (degrees - floor(degrees));
+    double seconds = 60 * (minutes - floor(minutes));
+
+    if (isNegative)
+      degrees = -1 * floor(degrees);
+    else
+      degrees = floor(degrees);
+
+    a_string << degrees << ":" << floor(minutes) << ":" << seconds; // TODO use this form for others?
+
+  }
+
+  // TODO template this? meh. ambiguity problems.
+
+  std::ostream& operator<< (std::ostream& os, const LimitedRangeAngle& a) {
+    std::stringstream out;
+    value2DMSString(a.value(), out);
+    return os << out.str();
+  }
+
+  std::ostream& operator<< (std::ostream& os, const Declination& a) {
+    std::stringstream out;
+    value2DMSString(a.value(), out);
+    return os << out.str();
+  }
+
+
+  // typedef Latitude looks like redefinition of Declination. Works ok as same.
+
+
+  std::ostream& operator<< (std::ostream& os, const Longitude& a) {
+    std::stringstream out;
+    value2DMSString(a.value(), out);
+    return os << out.str();
+  }
+
+  std::ostream& operator<< (std::ostream& os, const RA& a) {
+    std::stringstream out;
+    value2HMSString(a.value(), out);
+    return os << out.str();
+  }
+
 
 
 } // end namespace Angles
-
