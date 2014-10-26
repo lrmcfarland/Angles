@@ -5,9 +5,9 @@
 This repo demonstrates how to take C++ templates into a Python module.
 I have a C++ angle class for use in astronomy applications. I start
 with a class to construct angles from degrees, minutes and seconds
-(doubles or strings). I also create the copy and assign constructors
-and overload the basic arithmetic operators, e.g. +, +=, -, -= et
-al. and boolean operators, ==, >, <= to make full featured objects.
+(doubles or strings). To make full featured objectsI also create the
+copy and assign constructors and overload the basic arithmetic
+operators and boolean operators, e.g. +, +=, -, -=, >, <= et al.
 
 I also create a C++ template to build sets of limited range angle
 objects like [declination](http://en.wikipedia.org/wiki/Declination)
@@ -86,7 +86,7 @@ int main () {
   std::cout << "sin(a1 + a2) = " << sin(a1.radians()) << std::endl;
 
   try {
-    Angles::Latitude(200);
+    Angles::Latitude a3(200);
   } catch (Angles::RangeError err) {
     std::cout << "Error: " << err.what() << std::endl;
   }

@@ -25,7 +25,7 @@ int main () {
   std::cout << "sin(a1 + a2) = " << sin(a1.radians()) << std::endl;
 
   try {
-    Angles::Latitude(200);
+    Angles::Latitude a3(200);
   } catch (Angles::RangeError err) {
     std::cout << "Error: " << err.what() << std::endl;
   }
