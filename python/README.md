@@ -98,8 +98,9 @@ The Boost wrappers has several differenced from the manual extension.
 
 #### Exceptions
 
-Boost automagiclly wraps the C++ exceptions and does not "blow the
-stack".  (As see below, it does note Declination and Latitude have the same
+Unlike the current manual version, [Boost translates all C++ exceptions](http://www.boost.org/doc/libs/1_37_0/libs/python/doc/v2/exception_translator.html).
+
+(As seen below, it also notes Declination and Latitude have the same
 template. The manual version does not do this.)	
 
 
