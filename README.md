@@ -4,20 +4,20 @@
 
 This repo demonstrates how to take C++ templates into a Python module.
 I have a C++ angle class for use in astronomy applications. I start
-with a class to construct angles from degrees, minutes and seconds
-(doubles or strings). To make full featured objectsI also create the
+with constructors to create angles from degrees, minutes and seconds
+(doubles or strings). To make full featured objects I add the
 copy and assign constructors and overload the basic arithmetic
-operators and boolean operators, e.g. +, +=, -, -=, >, <= et al.
+and boolean operators, e.g. +, +=, -, -=, >, <= et al.
 
-I also create a C++ template to build sets of limited range angle
+I have a C++ template to build sets of limited range angle
 objects like [declination](http://en.wikipedia.org/wiki/Declination)
 and [right
 ascension](http://en.wikipedia.org/wiki/Right_ascension). Objects
-built from the template will raise an exception if their range is
+built from this template will raise an exception if their range is
 exceed, either in the constructor or by a math operation like
 addition.
 
-I wrap these in Python both [manually
+I wrap these in Python by both [manually
 extending](https://docs.python.org/2/extending/extending.html) angles
 and using [Boost](http://www.boost.org) wrappers.
 [SWIG](http://www.swig.org) is next.
