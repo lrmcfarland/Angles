@@ -47,7 +47,7 @@ TODO
 
 See [libAngles/example1.cpp](libAngles/example1.cpp).
 
-'''
+```
 // ============================================================
 // Filename:    example1.cpp
 //
@@ -82,11 +82,11 @@ int main () {
 
   return 0;
 }
-'''
+```
 
 This has its own make target "example1"
 
-'''
+```
 $ make example1
 g++ -g -W -Wall -fPIC -I.   -c -o example1.o example1.cpp
 g++ example1.o -o example1 -L. -lAngles
@@ -97,11 +97,11 @@ a1 = 45* 0' 0"
 a2 = 45* 0' 0"
 sin(a1 + a2) = 1
 Error: maximum exceeded
-'''
+```
 
 ### Python
 
-'''
+```
 >>> import angles
 >>> a = angles.Angle(45)
 >>> b = a
@@ -112,7 +112,7 @@ Error: maximum exceeded
 1.5707963267948966
 >>> 
 
-'''
+```
 
 
 ## TODO
