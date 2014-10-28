@@ -28,12 +28,25 @@ as expected.
 ## Build
 
 Each directory has its own Makefile with 'build', 'test', and 'clean'
-targets.  libAngles must be built first. There is a build.sh script
-that runs the Makefiles in all the directories in the necessary order
-and takes these targets as command line arguments. There may be some
-missing make dependencies between the directories, but it is always
-safe to build clean then build test. The module is still small enough
-that this doesn't take much time.
+targets, e.g.
+
+```
+$ pwd
+/Users/.../Angles/libAngles
+$ make clean
+$ make test
+```
+
+libAngles must be built first. There is a build.sh script that runs
+the Makefiles in all the directories in the necessary order and takes
+these targets as command line arguments.
+
+```
+$ pwd
+/Users/.../Angles/libAngles
+$ ./build.sh clean
+$ ./build.sh test
+```
 
 Each directory also has a suite of unit tests. libAngles uses
 [gtest](https://code.google.com/p/googletest/). The Python
@@ -130,7 +143,7 @@ Error: maximum exceeded
 
 ### Manual
 
-- Angle specific exception handling
+- TBD
 
 ### Boost
 

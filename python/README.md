@@ -5,8 +5,7 @@ found some interesting differences. For example it is not yet clear to
 me how to make the rich comparison operators work in Boost like they
 do manually or in [SWIG](swig.org) or wrap the exception handling
 manually. This is still a work in progress and I am still
-investigating how to make it happen. Any advice or hints would be
-welcome.
+investigating how to make it happen.
 
 ### [Manual Extension](https://docs.python.org/2/extending/extending.html)
 
@@ -26,18 +25,20 @@ The manual extension has several differenced from the Boost wrappers.
 - rich comparison operators <, <=, ==, !=. >=, >
 - a separate repr
 - unitary minus
+- angles.Error exceptions
+- raises an exception when the value is set out of range for the limited range angles.
 
 #### has not
 
 - copy constructor
 - copy assign
 - properties, e.g. a_space.x() not a_space.x
-- automatic exception handler for runtime errors
+
 
 #### Exceptions
 
-TODO the C++ exceptions are not caught by the python interpreter and
-will "blow the stack" when encountered.
+This module has its own angles.Error exceptions. Boost uses
+RuntimeError to wrap the C++ Exceptions.
 
 #### Class vs. Template
 
@@ -46,7 +47,7 @@ LimitedRangeAngle templates. Deep in the arithmetic operators, +, -,
 *, /, I found an undocumented feature: The Angle class can construct
 the result using the copy constructor, (e.g. + and -) or the copy
 assign constructor (e.g. * and /), but the template versions can
-not. (It was just whimsy that drove my choice of these construction
+not. (It was just the dumb luck of my choice of these construction
 techniques for these operators and lead to this finding.) This
 produces out of range errors, probably from using the addresses and
 not the values of the objects. This is not the case for the Boost
@@ -94,6 +95,8 @@ The Boost wrappers has several differenced from the manual extension.
 - rich comparison operators <, <=, ==, !=. >=, >
 - a separate repr (uses operator<<())
 - unitary minus
+- angles.Error exceptions
+- does not raise an exception when the value is set out of range for the limited range angles.
 
 
 #### Exceptions
