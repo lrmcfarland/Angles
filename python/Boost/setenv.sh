@@ -5,9 +5,9 @@
 # TODO: add linux support
 #
 
-# ----------------------
-# ----- Angle root -----
-# ----------------------
+# -----------------------
+# ----- Angles root -----
+# -----------------------
 
 if [ -n "$ANGLE_ROOT" ]; then
     echo "# ANGLE_ROOT is" $ANGLE_ROOT

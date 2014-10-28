@@ -5,9 +5,9 @@
 # TODO: add linux support
 #
 
-# --------------------------------
-# ----- Cartesian space root -----
-# --------------------------------
+# -----------------------
+# ----- Angles root -----
+# -----------------------
 
 if [ -n "$ANGLES_ROOT" ]; then
     echo "# ANGLES_ROOT is" $ANGLES_ROOT
@@ -30,10 +30,10 @@ export DYLD_LIBRARY_PATH=${DYLD_LIBRARY_PATH}:${ANGLES_LIBRARY_PATH}
 ANGLES_SO=`find  ${ANGLES_ROOT}/python/Manual -name angles.so`
 
 if [ -n "$ANGLES_SO" ]; then
-    echo "# space.so:" $ANGLES_SO
+    echo "# angles.so:" $ANGLES_SO
     export PYTHONPATH=${PYTHONPATH}:$(dirname ${ANGLES_SO})
 else
-    echo "space.so not found"
+    echo "angles.so not found"
     exit 1
 fi
 
