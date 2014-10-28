@@ -133,7 +133,6 @@ namespace {
     EXPECT_EQ(Angles::Angle::deg2rad(-45), a.getRadians());
   }
 
-
   // ----- booleans -----
 
   TEST(Angle, Equivalence1) {
@@ -502,6 +501,10 @@ namespace {
     EXPECT_EQ(360, a.getMaximum());
   }
 
+  TEST(LimitedRangeAngle, Accessor_error) {
+    Angles::LimitedRangeAngle a;
+    EXPECT_THROW(a.value(361), Angles::RangeError);
+  }
 
   // ----- booleans -----
 

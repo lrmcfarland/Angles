@@ -220,11 +220,11 @@ namespace Angles {
 
 
     // ----- accessors -----
-    void          value(const double& a_value) {m_value = a_value;}
+    void          value(const double& a_value) throw (RangeError);
     const double& value() const                {return m_value;}
     double        getValue() const             {return m_value;} // for boost
 
-    void          radians(const double& a_value) {value(rad2deg(a_value));}
+    void          radians(const double& a_value) throw (RangeError) {value(rad2deg(a_value));}
     double        radians() const                {return deg2rad(value());}
     double        getRadians() const             {return deg2rad(value());} // for boost
 
@@ -261,7 +261,7 @@ namespace Angles {
 
     double m_value; // degrees for declination, latitude, longitude, seconds for right ascension
 
-    double m_minimum; // TODO const with copy constructor possible?
+    double m_minimum;
     double m_maximum;
 
   };
@@ -274,15 +274,8 @@ namespace Angles {
     : m_minimum(A_MINIMUM), m_maximum(A_MAXIMUM)
   {
     double temp(degrees2seconds(a_deg, a_min, a_sec)/3600.0);
-
-    if (temp < minimum())
-      throw RangeError("minimum exceeded");
-
-    if (temp > maximum())
-      throw RangeError("maximum exceeded");
-
+    validRange(temp);
     value(temp);
-
   };
 
   // constructor from strings
@@ -299,15 +292,8 @@ namespace Angles {
     double temp(degrees2seconds(Angles::stod(a_deg),
 				Angles::stod(a_min),
 				Angles::stod(a_sec))/3600.0);
-
-    if (temp < minimum())
-      throw RangeError("minimum exceeded");
-
-    if (temp > maximum())
-      throw RangeError("maximum exceeded");
-
+    validRange(temp);
     value(temp);
-
   };
 
   // copy constructor
@@ -362,6 +348,13 @@ namespace Angles {
 
 
   // in-place arithmetic operator method templates
+
+  // value
+  template<int A_MINIMUM, int A_MAXIMUM>
+    void LRA<A_MINIMUM, A_MAXIMUM>::value(const double& a_value) throw (RangeError) {
+    validRange(a_value);
+    m_value = a_value;
+  }
 
   // validRange
   template<int A_MINIMUM, int A_MAXIMUM>
