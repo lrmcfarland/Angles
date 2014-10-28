@@ -323,7 +323,12 @@ static PyObject* %(TypeName)s_nb_divide(PyObject* o1, PyObject* o2) {
     return NULL;
   }
 
-  result_angle->m_angle = ((%(TypeName)s*)o1)->m_angle / ((%(TypeName)s*)o2)->m_angle;
+  try {
+    result_angle->m_angle = ((%(TypeName)s*)o1)->m_angle / ((%(TypeName)s*)o2)->m_angle;
+  } catch (Angles::Error err) {
+    PyErr_SetString(sAngleException, err.what());
+    return NULL;
+  }
 
   return (PyObject*) result_angle;
 }
@@ -596,17 +601,14 @@ static int %(TypeName)s_init(%(TypeName)s* self, PyObject* args, PyObject* kwds)
   if (! PyArg_ParseTupleAndKeywords(args, kwds, "|ddd", kwlist, &degrees, &minutes, &seconds))
     return -1;
 
-
-
-  // TODO check minimum/maximum this bypasses constructor!!!
-
-  // use constructor to raise exception if not valie
-  Angles::%(TypeName)s the_difference(Angles::degrees2seconds(degrees, minutes, seconds)/3600);
-
-  // TODO use validate instead? raise exception if not valid?
-
-  // value initialized to 0 by new.
-  self->m_angle.value(Angles::degrees2seconds(degrees, minutes, seconds)/3600);
+  try {
+    // use constructor to raise an exception if the value is not in the valid range.
+    Angles::%(TypeName)s an_angle(Angles::degrees2seconds(degrees, minutes, seconds)/3600);
+    self->m_angle.value(an_angle.value());
+  } catch (Angles::Error err) {
+    PyErr_SetString(sAngleException, err.what());
+    return -1;
+  }
 
   return 0;
 }
@@ -647,19 +649,26 @@ static PyObject* %(TypeName)s_getValue(%(TypeName)s* self, void* closure) {
   return PyFloat_FromDouble(self->m_angle.value());
 }
 
-static int %(TypeName)s_setValue(%(TypeName)s* self, PyObject* value, void* closure) {
+static int %(TypeName)s_setValue(%(TypeName)s* self, PyObject* a_value, void* closure) {
 
-  if (value == NULL) {
+  if (a_value == NULL) {
     PyErr_SetString(sAngleException, "Cannot delete value");
     return 0;
   }
 
-  if (!PyFloat_Check(value) && !PyInt_Check(value)) {
+  if (!PyFloat_Check(a_value) && !PyInt_Check(a_value)) {
     PyErr_SetString(sAngleException, "value must be a float");
     return 0;
   }
 
-  self->m_angle.value(PyFloat_AsDouble(value));
+  try {
+    // use constructor to raise an exception if the value is not in the valid range.
+    Angles::%(TypeName)s an_angle(PyFloat_AsDouble(a_value));
+    self->m_angle.value(an_angle.value());
+  } catch (Angles::Error err) {
+    PyErr_SetString(sAngleException, err.what());
+    return -1;
+  }
 
   return 0;
 }
@@ -720,12 +729,15 @@ static PyObject* %(TypeName)s_nb_add(PyObject* o1, PyObject* o2) {
     return NULL;
   }
 
-  Angles::%(TypeName)s the_sum(((%(TypeName)s*)o1)->m_angle.value() + ((%(TypeName)s*)o2)->m_angle.value());
-
-  // copy because m_angle constructor has already run.
-  result_angle->m_angle = the_sum;
-
-  return (PyObject*) result_angle;
+  try {
+    // use constructor to raise an exception if the value is not in the valid range.
+    Angles::%(TypeName)s the_sum(((%(TypeName)s*)o1)->m_angle.value() + ((%(TypeName)s*)o2)->m_angle.value());
+    result_angle->m_angle = the_sum; // copy because m_angle constructor has already run.
+    return (PyObject*) result_angle;
+  } catch (Angles::Error err) {
+    PyErr_SetString(sAngleException, err.what());
+    return NULL;
+  }
 }
 
 
@@ -745,12 +757,15 @@ static PyObject* %(TypeName)s_nb_subtract(PyObject* o1, PyObject* o2) {
     return NULL;
   }
 
-  Angles::%(TypeName)s the_difference(((%(TypeName)s*)o1)->m_angle.value() - ((%(TypeName)s*)o2)->m_angle.value());
-
-  // copy because m_angle constructor has already run.
-  result_angle->m_angle = the_difference;
-
-  return (PyObject*) result_angle;
+  try {
+    // use constructor to raise an exception if the value is not in the valid range.
+    Angles::%(TypeName)s the_difference(((%(TypeName)s*)o1)->m_angle.value() - ((%(TypeName)s*)o2)->m_angle.value());
+    result_angle->m_angle = the_difference;
+    return (PyObject*) result_angle;
+  } catch (Angles::Error err) {
+    PyErr_SetString(sAngleException, err.what());
+    return NULL;
+  }
 }
 
 
@@ -771,12 +786,15 @@ static PyObject* %(TypeName)s_nb_negative(PyObject* o1) {
     return NULL;
   }
 
-  Angles::%(TypeName)s the_inverse(-((%(TypeName)s*)o1)->m_angle.value());
-
-  // copy because m_angle constructor has already run.
-  result_angle->m_angle = the_inverse;
-
-  return (PyObject*) result_angle;
+  try {
+    // use constructor to raise an exception if the value is not in the valid range.
+    Angles::%(TypeName)s the_inverse(-((%(TypeName)s*)o1)->m_angle.value());
+    result_angle->m_angle = the_inverse;
+    return (PyObject*) result_angle;
+  } catch (Angles::Error err) {
+    PyErr_SetString(sAngleException, err.what());
+    return NULL;
+  }
 }
 
 
@@ -795,11 +813,15 @@ static PyObject* %(TypeName)s_nb_multiply(PyObject* o1, PyObject* o2) {
     return NULL;
   }
 
-  Angles::%(TypeName)s the_product(((%(TypeName)s*)o1)->m_angle.value() * ((%(TypeName)s*)o2)->m_angle.value());
-
-  result_angle->m_angle = the_product;
-
-  return (PyObject*) result_angle;
+  try {
+    // use constructor to raise an exception if the value is not in the valid range.
+    Angles::%(TypeName)s the_product(((%(TypeName)s*)o1)->m_angle.value() * ((%(TypeName)s*)o2)->m_angle.value());
+    result_angle->m_angle = the_product;
+    return (PyObject*) result_angle;
+  } catch (Angles::Error err) {
+    PyErr_SetString(sAngleException, err.what());
+    return NULL;
+  }
 }
 
 
@@ -818,11 +840,15 @@ static PyObject* %(TypeName)s_nb_divide(PyObject* o1, PyObject* o2) {
     return NULL;
   }
 
-  Angles::%(TypeName)s the_quotient(((%(TypeName)s*)o1)->m_angle.value() / ((%(TypeName)s*)o2)->m_angle.value());
-
-  result_angle->m_angle = the_quotient;
-
-  return (PyObject*) result_angle;
+  try {
+    // use constructor to raise an exception if the value is not in the valid range.
+    Angles::%(TypeName)s the_quotient(((%(TypeName)s*)o1)->m_angle.value() / ((%(TypeName)s*)o2)->m_angle.value());
+    result_angle->m_angle = the_quotient;
+    return (PyObject*) result_angle;
+  } catch (Angles::Error err) {
+    PyErr_SetString(sAngleException, err.what());
+    return NULL;
+  }
 }
 
 
@@ -832,9 +858,6 @@ static PyObject* %(TypeName)s_tp_richcompare(PyObject* o1, PyObject* o2, int op)
     Py_INCREF(Py_NotImplemented);
     return Py_NotImplemented;
   }
-
-
-  // TODO >, >=, <, <=
 
   if (op == Py_LT) {
 
@@ -1041,18 +1064,6 @@ static int is_%(TypeName)sType(PyObject* an_angle) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 module_init = """
 // --------------------------
 // ----- module methods -----
@@ -1109,7 +1120,7 @@ PyMODINIT_FUNC initangles(void) {
   PyObject* m(Py_InitModule3("angles", angles_module_methods, "python wrappers for angle objects."));
 
   // error
-  char eMsgStr[] = "angles.error";
+  char eMsgStr[] = "angles.Error";
   sAngleException = PyErr_NewException(eMsgStr, NULL, NULL);
   Py_INCREF(sAngleException);
   PyModule_AddObject(m, "Error", sAngleException);

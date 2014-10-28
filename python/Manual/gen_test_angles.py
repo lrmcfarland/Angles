@@ -308,20 +308,11 @@ class TestAngle(unittest.TestCase):
         self.assertAlmostEqual(self.rd1 / self.rd2, a3.value, self.places)
 
 
-    # TODO works in Boost.
-    # 
-    # NameError: global name 'DivideByZeroError' is not defined
-    #   File "test_angles.py", line 362
-    # self.assertRaises(Angles::DivideByZeroError, lambda a: a / 0.0, a1)
-    #                                       ^
-    # SyntaxError: invalid syntax
-    #
-    @unittest.skip('TODO Not yet available in Manual, but it is in Boost')
     def test_angle_divide_zero(self):
         \"\"\"Test angle / 0\"\"\"
         a1 = angles.Angle(self.rd1)
         a2 = angles.Angle(0)
-        self.assertRaises(RuntimeError, lambda a, b: a / b, a1, a2)
+        self.assertRaises(angles.Error, lambda a, b: a / b, a1, a2)
 
 
    # strings
@@ -341,26 +332,9 @@ class TestAngle(unittest.TestCase):
 
 """ # end angle class template
 
-
-
-
-
-
-
-
-
 # ===================================
 # ===== Angle Template Template =====
 # ===================================
-
-
-
-
-
-
-
-
-
 
 angle_template_template = """
 
@@ -397,34 +371,13 @@ class Test%(TypeName)s(unittest.TestCase):
         self.rs2 = random.uniform(self.lower_minute_range, self.upper_minute_range)
 
     # range errors
-
-    # TODO works in Boost as a RuntimeError
-    # 
-    # NameError: global name 'RangeError' is not defined
-    #
-    # self.assertRaises(Angles::RangeError, lambda a: a / 0.0, a1)
-    #                                       ^
-    # SyntaxError: invalid syntax
-    #
-    @unittest.skip('TODO Not yet available in Manual, but it is in Boost')
     def test_construction_range_error_lo(self):
-        \"\"\"Test range error lo\"\"\"
-        self.assertRaises(RuntimeError, lambda: angles.%(TypeName)s(%(lower_range_limit)s - 1))
+        \"\"\"Test constructor range error lo\"\"\"
+        self.assertRaises(angles.Error, lambda: angles.%(TypeName)s(%(lower_range_limit)s - 1))
 
-
-    # TODO works in Boost as a RuntimeError
-    # 
-    # NameError: global name 'RangeError' is not defined
-    #
-    # self.assertRaises(Angles::RangeError, lambda a: a / 0.0, a1)
-    #                                       ^
-    # SyntaxError: invalid syntax
-    #
-    @unittest.skip('TODO Not yet available in Manual, but it is in Boost')
     def test_construction_range_error_hi(self):
-        \"\"\"Test range error hi\"\"\"
-        self.assertRaises(RuntimeError, lambda: angles.%(TypeName)s(%(upper_range_limit)s + 1))
-
+        \"\"\"Test constructor range error hi\"\"\"
+        self.assertRaises(angles.Error, lambda: angles.%(TypeName)s(%(upper_range_limit)s + 1))
 
     # static/module methods
 
@@ -590,19 +543,39 @@ class Test%(TypeName)s(unittest.TestCase):
 
     # accessors
 
-    def test_accessors_1(self):
-        \"\"\"Test value accessors 1\"\"\"
+    def test_accessors_hi(self):
+        \"\"\"Test value accessors hi\"\"\"
         an_angle = angles.%(TypeName)s()
-        an_angle.value = 90
-        self.assertEqual(90, an_angle.value)
-        self.assertEqual(math.pi/2.0, an_angle.radians)
+        an_angle.value = %(upper_range_limit)s
+        self.assertEqual(%(upper_range_limit)s, an_angle.value)
+        self.assertEqual(angles.deg2rad(%(upper_range_limit)s), an_angle.radians)
 
-    def test_accessors_2(self):
-        \"\"\"Test radians accessor negative\"\"\"
+    def test_accessors_lo(self):
+        \"\"\"Test value accessors lo\"\"\"
         an_angle = angles.%(TypeName)s()
-        an_angle.radians = -math.pi/2.0
-        self.assertEqual(-90, an_angle.value)
-        self.assertEqual(-math.pi/2.0, an_angle.radians)
+        an_angle.value = %(lower_range_limit)s
+        self.assertEqual(%(lower_range_limit)s, an_angle.value)
+        self.assertEqual(angles.deg2rad(%(lower_range_limit)s), an_angle.radians)
+
+
+    def test_value_range_error_lo(self):
+        \"\"\"Test value range error lo\"\"\"
+        try:
+            a1 = angles.%(TypeName)s()
+            a1.value = %(lower_range_limit)s - 1
+            self.assertTrue(False) # correct behavior skips this line
+        except angles.Error, err:
+            self.assertTrue(angles.Error == type(err))
+
+
+    def test_value_range_error_hi(self):
+        \"\"\"Test value range error hi\"\"\"
+        try:
+            a1 = angles.%(TypeName)s()
+            a1.value = %(upper_range_limit)s + 1
+            self.assertTrue(False) # correct behavior skips this line
+        except angles.Error, err:
+            self.assertTrue(angles.Error == type(err))
 
 
     # operators
@@ -616,6 +589,16 @@ class Test%(TypeName)s(unittest.TestCase):
         a1 += a2
         self.assertAlmostEqual(self.rd1 + self.rd2, a1.value, self.places)
 
+    def test_inplace_add_exception(self):
+        \"\"\"Test inplace add exception\"\"\"
+        a1 = angles.%(TypeName)s(%(upper_range_limit)s)
+        a2 = angles.%(TypeName)s(%(upper_range_limit)s)
+        try:
+            a1 += a2
+            self.assertTrue(False) # correct behavior skips this line
+        except angles.Error, err:
+            self.assertTrue(angles.Error == type(err))
+
     def test_angle_plus_angle(self):
         \"\"\"Test angle + angle\"\"\"
         a1 = angles.%(TypeName)s(self.rd1)
@@ -624,6 +607,11 @@ class Test%(TypeName)s(unittest.TestCase):
         a3 = a1 + a2
         self.assertAlmostEqual(self.rd1 + self.rd2, a3.value, self.places)
 
+    def test_add_exception(self):
+        \"\"\"Test add exception\"\"\"
+        a1 = angles.%(TypeName)s(%(upper_range_limit)s)
+        a2 = angles.%(TypeName)s(%(upper_range_limit)s)
+        self.assertRaises(angles.Error, lambda a, b: a + b, a1, a2)
 
     # subtract
 
@@ -643,6 +631,15 @@ class Test%(TypeName)s(unittest.TestCase):
             a1 -= a2
             self.assertAlmostEqual(self.rd1 - self.rd2, a1.value, self.places)
 
+    def test_inplace_subtract_exception(self):
+        \"\"\"Test inplace subtract exception\"\"\"
+        a1 = angles.%(TypeName)s(%(lower_range_limit)s)
+        a2 = angles.%(TypeName)s(%(upper_range_limit)s)
+        try:
+            a1 -= a2
+            self.assertTrue(False) # correct behavior skips this line
+        except angles.Error, err:
+            self.assertTrue(angles.Error == type(err))
 
     def test_angle_minus_angle(self):
         \"\"\"Test angle - angle\"\"\"
@@ -660,12 +657,26 @@ class Test%(TypeName)s(unittest.TestCase):
             a3 = a1 - a2
             self.assertAlmostEqual(self.rd1 - self.rd2, a3.value, self.places)
 
+    def test_subtract_exception(self):
+        \"\"\"Test add exception\"\"\"
+        a1 = angles.%(TypeName)s(%(lower_range_limit)s)
+        a2 = angles.%(TypeName)s(%(upper_range_limit)s)
+        self.assertRaises(angles.Error, lambda a, b: a - b, a1, a2)
+
+    # unitary minus
 
     def test_unitary_minus(self):
         \"\"\"Test angle = -angle\"\"\"
-        a1 = angles.Angle(self.rd1)
-        a2 = -a1
-        self.assertAlmostEqual(a1.value, -a2.value, self.places)
+        if not %(unsigned)s:
+            a1 = angles.%(TypeName)s(self.rd1)
+            a2 = -a1
+            self.assertAlmostEqual(a1.value, -a2.value, self.places)
+
+    def test_unitary_minus_exception(self):
+        \"\"\"Test unitary minus exception\"\"\"
+        if %(unsigned)s:
+            a1 = angles.%(TypeName)s(self.rd1)
+            self.assertRaises(angles.Error, lambda a: -a, a1)
 
 
     # multiply
@@ -677,6 +688,16 @@ class Test%(TypeName)s(unittest.TestCase):
         a1 *= a2
         self.assertAlmostEqual(self.rd1 * 2, a1.value, self.places)
 
+    def test_inplace_multiply_exception(self):
+        \"\"\"Test inplace multiply exception\"\"\"
+        a1 = angles.%(TypeName)s(%(upper_range_limit)s)
+        a2 = angles.%(TypeName)s(%(upper_range_limit)s)
+        try:
+            a1 *= a2
+            self.assertTrue(False) # correct behavior skips this line
+        except angles.Error, err:
+            self.assertTrue(angles.Error == type(err))
+
     def test_angle_times_angle(self):
         \"\"\"Test angle * angle\"\"\"
         a1 = angles.%(TypeName)s(self.rd1)
@@ -684,6 +705,11 @@ class Test%(TypeName)s(unittest.TestCase):
         a3 = a1 * a2
         self.assertAlmostEqual(self.rd1 * 2, a3.value, self.places)
 
+    def test_multiply_exception(self):
+        \"\"\"Test multiply exception\"\"\"
+        a1 = angles.%(TypeName)s(%(upper_range_limit)s)
+        a2 = angles.%(TypeName)s(%(upper_range_limit)s)
+        self.assertRaises(angles.Error, lambda a, b: a * b, a1, a2)
 
     # divide
 
@@ -694,6 +720,16 @@ class Test%(TypeName)s(unittest.TestCase):
         a1 /= a2
         self.assertAlmostEqual(self.rd1 / 2, a1.value, self.places)
 
+    def test_inplace_divide_exception(self):
+        \"\"\"Test inplace divide exception\"\"\"
+        a1 = angles.%(TypeName)s(%(upper_range_limit)s)
+        a2 = angles.%(TypeName)s(0.5)
+        try:
+            a1 /= a2
+            self.assertTrue(False) # correct behavior skips this line
+        except angles.Error, err:
+            self.assertTrue(angles.Error == type(err))
+
     def test_angle_divide_angle(self):
         \"\"\"Test angle / angle foo\"\"\"
         a1 = angles.%(TypeName)s(self.rd1)
@@ -701,22 +737,17 @@ class Test%(TypeName)s(unittest.TestCase):
         a3 = a1 / a2
         self.assertAlmostEqual(self.rd1 / 2, a3.value, self.places)
 
+    def test_divide_exception(self):
+        \"\"\"Test divide exception\"\"\"
+        a1 = angles.%(TypeName)s(%(upper_range_limit)s)
+        a2 = angles.%(TypeName)s(0.5)
+        self.assertRaises(angles.Error, lambda a, b: a / b, a1, a2)
 
-    # TODO works in Boost.
-    # 
-    # NameError: global name 'DivideByZeroError' is not defined
-    #   File "test_angles.py", line 362
-    # self.assertRaises(Angles::DivideByZeroError, lambda a: a / 0.0, a1)
-    #                                       ^
-    # SyntaxError: invalid syntax
-    # TODO RuntimeError works for RangeError???
-    #
-    @unittest.skip('TODO Not yet available in Manual, but it is in Boost')
     def test_angle_divide_zero(self):
         \"\"\"Test angle / 0\"\"\"
         a1 = angles.%(TypeName)s(self.rd1)
         a2 = angles.%(TypeName)s(0)
-        self.assertRaises(RuntimeError, lambda a, b: a / b, a1, a2)
+        self.assertRaises(angles.Error, lambda a, b: a / b, a1, a2)
 
 
 """
