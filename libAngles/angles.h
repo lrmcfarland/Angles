@@ -284,11 +284,7 @@ namespace Angles {
     : m_minimum(A_MINIMUM), m_maximum(A_MAXIMUM)
   {
     double temp(degrees2seconds(a_deg, a_min, a_sec)/3600.0);
-
-    // TODO setValue?
-
-    validRange(temp);
-    value(temp);
+    setValue(temp);
   };
 
   // constructor from strings
@@ -305,11 +301,7 @@ namespace Angles {
     double temp(degrees2seconds(Angles::stod(a_deg),
 				Angles::stod(a_min),
 				Angles::stod(a_sec))/3600.0);
-
-    // TODO setValue?
-
-    validRange(temp);
-    value(temp);
+    setValue(temp);
   };
 
   // copy constructor
