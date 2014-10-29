@@ -65,7 +65,7 @@ $(TARGET_D): $(OBJECTS) $(INCLUDES) $(SOURCES)
 
 
 test: angles_unittest
-	./angles_unittest
+	./angles_unittest.sh
 
 angles_unittest: angles_unittest.o $(TARGET_D)
 	g++ -L$(GTEST_DIR) -lgtest -L. -lAngles angles_unittest.o -o angles_unittest

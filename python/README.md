@@ -80,7 +80,7 @@ so this is not the only difference and two templates are still needed.
 - **setup.py** builds the angles module.
 - **test_angles.sh** sets up the Python environment and runs the unit tests.
 
-The Boost wrappers has several differenced from the manual extension.
+The Boost wrappers have several differences from the manual extension.
 (This list is not definitive or complete. I am still working to resolve the differences.)
 
 #### has
@@ -95,8 +95,7 @@ The Boost wrappers has several differenced from the manual extension.
 - rich comparison operators <, <=, ==, !=. >=, >
 - a separate repr (uses operator<<())
 - unitary minus
-- angles.Error exceptions
-- does not raise an exception when the value is set out of range for the limited range angles.
+- angles.Error exceptions (RuntimeErrors instead)
 
 
 #### Exceptions

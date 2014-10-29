@@ -578,7 +578,6 @@ class Test%(TypeName)s(unittest.TestCase):
         self.assertEqual(angles.Angle.deg2rad(%(lower_range_limit)s), an_angle.radians)
 
 
-    @unittest.skip('Not available in boost')
     def test_value_range_error_lo(self):
         \"\"\"Test value range error lo\"\"\"
         try:
@@ -586,10 +585,18 @@ class Test%(TypeName)s(unittest.TestCase):
             a1.value = %(lower_range_limit)s - 1
             self.assertTrue(False) # correct behavior skips this line
         except RuntimeError, err:
-            self.assertTrue(angles.Error == type(err))
+            self.assertTrue(RuntimeError == type(err))
+
+    def test_radians_range_error_lo(self):
+        \"\"\"Test radians range error lo\"\"\"
+        try:
+            a1 = angles.%(TypeName)s()
+            a1.radians = %(lower_range_limit)s - 1
+            self.assertTrue(False) # correct behavior skips this line
+        except RuntimeError, err:
+            self.assertTrue(RuntimeError == type(err))
 
 
-    @unittest.skip('Not available in boost')
     def test_value_range_error_hi(self):
         \"\"\"Test value range error hi\"\"\"
         try:
@@ -597,7 +604,16 @@ class Test%(TypeName)s(unittest.TestCase):
             a1.value = %(upper_range_limit)s + 1
             self.assertTrue(False) # correct behavior skips this line
         except RuntimeError, err:
-            self.assertTrue(angles.Error == type(err))
+            self.assertTrue(RuntimeError == type(err))
+
+    def test_radians_range_error_hi(self):
+        \"\"\"Test radians range error hi\"\"\"
+        try:
+            a1 = angles.%(TypeName)s()
+            a1.radians = %(upper_range_limit)s + 1
+            self.assertTrue(False) # correct behavior skips this line
+        except RuntimeError, err:
+            self.assertTrue(RuntimeError == type(err))
 
 
     # operators

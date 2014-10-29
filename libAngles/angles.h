@@ -80,11 +80,15 @@ namespace Angles {
     // ----- accessors -----
     void          value(const double& a_value) {m_value = a_value;}
     const double& value() const                {return m_value;}
-    double        getValue() const             {return m_value;} // for boost
 
-    virtual void   radians(const double& a_value) {value(rad2deg(a_value));}
-    virtual double radians() const                {return deg2rad(value());}
-    double         getRadians() const             {return deg2rad(value());} // for boost
+    void          setValue(const double& a_value) {m_value = a_value;}
+    double        getValue() const                {return m_value;} // for boost
+
+    void          radians(const double& a_value) {value(rad2deg(a_value));}
+    double        radians() const                {return deg2rad(value());}
+
+    void           setRadians(const double& a_value) {value(rad2deg(a_value));}
+    double         getRadians() const                {return deg2rad(value());} // for boost
 
     // ----- boolean operators -----
 
@@ -222,10 +226,16 @@ namespace Angles {
     // ----- accessors -----
     void          value(const double& a_value) {m_value = a_value;}
     const double& value() const                {return m_value;}
+
+    // TODO: validate version in manual throws invalid exceptions
+    void          setValue(const double& a_value) throw (RangeError); // not for manual
     double        getValue() const             {return m_value;} // for boost
 
     void          radians(const double& a_value) {value(rad2deg(a_value));}
     double        radians() const                {return deg2rad(value());}
+
+    // TODO: validate version in manual throws invalid exceptions
+    void          setRadians(const double& a_value) throw (RangeError) {setValue(rad2deg(a_value));} // for not manual
     double        getRadians() const             {return deg2rad(value());} // for boost
 
     const double& minimum() const {return m_minimum;}
@@ -261,7 +271,7 @@ namespace Angles {
 
     double m_value; // degrees for declination, latitude, longitude, seconds for right ascension
 
-    double m_minimum; // TODO const with copy constructor possible?
+    double m_minimum;
     double m_maximum;
 
   };
@@ -275,14 +285,10 @@ namespace Angles {
   {
     double temp(degrees2seconds(a_deg, a_min, a_sec)/3600.0);
 
-    if (temp < minimum())
-      throw RangeError("minimum exceeded");
+    // TODO setValue?
 
-    if (temp > maximum())
-      throw RangeError("maximum exceeded");
-
+    validRange(temp);
     value(temp);
-
   };
 
   // constructor from strings
@@ -300,14 +306,10 @@ namespace Angles {
 				Angles::stod(a_min),
 				Angles::stod(a_sec))/3600.0);
 
-    if (temp < minimum())
-      throw RangeError("minimum exceeded");
+    // TODO setValue?
 
-    if (temp > maximum())
-      throw RangeError("maximum exceeded");
-
+    validRange(temp);
     value(temp);
-
   };
 
   // copy constructor
@@ -362,6 +364,13 @@ namespace Angles {
 
 
   // in-place arithmetic operator method templates
+
+  // value
+  template<int A_MINIMUM, int A_MAXIMUM>
+    void LRA<A_MINIMUM, A_MAXIMUM>::setValue(const double& a_value) throw (RangeError) {
+    validRange(a_value);
+    m_value = a_value;
+  }
 
   // validRange
   template<int A_MINIMUM, int A_MAXIMUM>

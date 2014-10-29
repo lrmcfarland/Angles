@@ -26,8 +26,8 @@ using namespace boost::python;
 """
 
 wrapper_template = """
-void (Angles::%(TypeName)s::*set%(TypeName)sValue)(const double&) = &Angles::%(TypeName)s::value;
-void (Angles::%(TypeName)s::*set%(TypeName)sRadians)(const double&) = &Angles::%(TypeName)s::radians;
+void (Angles::%(TypeName)s::*set%(TypeName)sValue)(const double&) = &Angles::%(TypeName)s::setValue;
+void (Angles::%(TypeName)s::*set%(TypeName)sRadians)(const double&) = &Angles::%(TypeName)s::setRadians;
 """
 
 module_init = """
