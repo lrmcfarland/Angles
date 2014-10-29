@@ -483,28 +483,51 @@ namespace {
   }
 
 
-  // TODO sign errors? Utils tested below.
-
-
   // accessors
 
-
-  TEST(LimitedRangeAngle, Accessors1) {
-    Angles::LimitedRangeAngle a(45);
-    EXPECT_EQ(45, a.value());
-    EXPECT_EQ(45, a.getValue());
-    EXPECT_EQ(Angles::LimitedRangeAngle::deg2rad(45), a.radians());
-    EXPECT_EQ(Angles::LimitedRangeAngle::deg2rad(45), a.getRadians());
+  TEST(LimitedRangeAngle, min_accessors) {
+    Angles::LimitedRangeAngle a;
     EXPECT_EQ(-360, a.minimum());
     EXPECT_EQ(-360, a.getMinimum());
+  }
+
+  TEST(LimitedRangeAngle, max_accessors) {
+    Angles::LimitedRangeAngle a;
     EXPECT_EQ(360, a.maximum());
     EXPECT_EQ(360, a.getMaximum());
   }
 
-  TEST(LimitedRangeAngle, Accessor_error) {
+  TEST(LimitedRangeAngle, value_accessors) {
     Angles::LimitedRangeAngle a;
-    EXPECT_THROW(a.value(361), Angles::RangeError);
+
+    a.value(45);
+    EXPECT_EQ(45, a.value());
+
+    a.setValue(-30);
+    EXPECT_EQ(-30, a.getValue());
   }
+
+  TEST(LimitedRangeAngle, radians_accessors) {
+    Angles::LimitedRangeAngle a;
+
+    a.radians(1.4);
+    EXPECT_EQ(1.4, a.radians());
+
+    a.setRadians(-1.2);
+    EXPECT_DOUBLE_EQ(-1.2, a.getRadians());
+
+  }
+
+  TEST(LimitedRangeAngle, value_ccessor_error) {
+    Angles::LimitedRangeAngle a;
+    EXPECT_THROW(a.setValue(361), Angles::RangeError);
+  }
+
+  TEST(LimitedRangeAngle, radians_accessor_error) {
+    Angles::LimitedRangeAngle a;
+    EXPECT_THROW(a.setRadians(361), Angles::RangeError);
+  }
+
 
   // ----- booleans -----
 
