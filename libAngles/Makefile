@@ -68,7 +68,7 @@ test: angles_unittest
 	./angles_unittest.sh
 
 angles_unittest: angles_unittest.o $(TARGET_D)
-	g++ -L$(GTEST_DIR)/lib/.libs -lgtest -L. -lAngles angles_unittest.o -o angles_unittest
+	g++ -L$(GTEST_DIR) -lgtest -L. -lAngles angles_unittest.o -o angles_unittest
 
 angles_unittest.o: angles_unittest.cpp
 	g++ -I$(GTEST_DIR)/include -I . -g -c angles_unittest.cpp
