@@ -7,14 +7,15 @@ from distutils.core import setup, Extension
 
 name = 'angles'
 version = '1.0'
+BOOST_ROOT = '/usr/local'
 
 include_dirs=['../../libAngles',
-              '/usr/local/include', # for boost
+              BOOST_ROOT + '/include',
               ]
 
 
 library_dirs=['../../libAngles',
-              '/usr/local/lib', # for boost
+              BOOST_ROOT + '/lib'
               ]
 
 libraries = ['boost_python', 'Angles']
