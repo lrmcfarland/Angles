@@ -27,7 +27,7 @@ int main () {
   try {
     Angles::Latitude a3(200);
   } catch (Angles::RangeError err) {
-    std::cout << "Error: " << err.what() << std::endl;
+    std::cout << "Caught RangeError: " << err.what() << std::endl;
   }
 
   return 0;

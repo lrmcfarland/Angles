@@ -43,7 +43,7 @@ these targets as command line arguments.
 
 ```
 $ pwd
-/Users/.../Angles/libAngles
+/Users/.../Angles/
 $ ./build.sh clean
 $ ./build.sh test
 ```
@@ -54,6 +54,45 @@ modules use Python native unittest.
 
 To build the Boost wrappers you will, of course, need to install
 [Boost](http://www.boost.org).
+
+### [googletest](https://code.google.com/p/googletest/)
+
+The C++ library uses [googletest](https://code.google.com/p/googletest/) to
+run the unit tests. I have downloaded and built it in /usr/local by
+following the instructions in the README
+
+```
+[root@lrmz-iMac gtest-1.7.0]# export GTEST_DIR=/usr/local/gtest-1.7.0
+[root@lrmz-iMac gtest-1.7.0]# g++ -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc
+
+[root@lrmz-iMac gtest-1.7.0]# ar -rv libgtest.a gtest-all.o
+ar: creating archive libgtest.a
+a - gtest-all.o
+```
+
+libAngles/Makefile sets its GTEST_DIR to /usr/local/gtest-1.7.0 and picks
+up libgtest.a from there.
+
+
+### [Boost](http://www.boost.org)
+
+I have been wanting to use [homebrew](http://brew.sh) to install
+boost, but some reason, I find it does not yet install
+libboost_python.a by default or even with the --with-python or
+--build-from-source options. So I built and installed it from source.
+
+```
+cd boost_1_56_0
+
+./bootstrap.sh
+./b2
+sudo ./b2 install
+```
+
+The files are now in /usr/local/include and /usr/local/lib/libboost_*
+and python/Boost/setup.py sets BOOST_ROOT to point there.
+brew doctor will notice and complain about this.
+
 
 ### OSX
 
@@ -120,12 +159,18 @@ $ ./example1.sh
 a1 = 45* 0' 0"
 a2 = 45* 0' 0"
 sin(a1 + a2) = 1
-Error: maximum exceeded
+Caught RangeError: maximum exceeded
 ```
 
 ### Python
 
+Use the pylaunch.sh script to set the environment varialbes.
+
 ```
+$ pwd
+/Users/.../Angles/python/Manual
+$ ./pylaunch.sh
+
 >>> import angles
 >>> a = angles.Angle(45)
 >>> b = a

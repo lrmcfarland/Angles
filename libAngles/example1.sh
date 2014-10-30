@@ -6,13 +6,13 @@
 #
 
 if [ -z "$ANGLES_ROOT" ]; then
-    ANGLES_ROOT=../
+    ANGLES_ROOT=..
     echo "# ANGLES_ROOT not set. Using" $ANGLES_ROOT
 else
     echo "# ANGLES_ROOT is" $ANGLES_ROOT
 fi
 
-ANGLE_LIBRARY_PATH=${ANGLES_ROOT}/libAngles
+ANGLES_LIBRARY_PATH=${ANGLES_ROOT}/libAngles
 
 # if OSX
 DYLD_LIBRARY_PATH=${ANGLES_LIBRARY_PATH} ${ANGLES_ROOT}/libAngles/example1 "$@"
