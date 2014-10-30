@@ -266,6 +266,7 @@ namespace Angles {
 
     // ----- helpers -----
     void validRange(const double& a_value) const throw (RangeError);
+    bool isValidRange(const double& a_value) const;
 
   private:
 
@@ -284,11 +285,7 @@ namespace Angles {
     : m_minimum(A_MINIMUM), m_maximum(A_MAXIMUM)
   {
     double temp(degrees2seconds(a_deg, a_min, a_sec)/3600.0);
-
-    // TODO setValue?
-
-    validRange(temp);
-    value(temp);
+    setValue(temp);
   };
 
   // constructor from strings
@@ -305,11 +302,7 @@ namespace Angles {
     double temp(degrees2seconds(Angles::stod(a_deg),
 				Angles::stod(a_min),
 				Angles::stod(a_sec))/3600.0);
-
-    // TODO setValue?
-
-    validRange(temp);
-    value(temp);
+    setValue(temp);
   };
 
   // copy constructor
@@ -375,12 +368,21 @@ namespace Angles {
   // validRange
   template<int A_MINIMUM, int A_MAXIMUM>
     void LRA<A_MINIMUM, A_MAXIMUM>::validRange(const double& a_value) const throw (RangeError) {
-    // ASSUMES: range limits are equal for both sides, enforced by the
-    // template construction.
     if (a_value < minimum())
       throw RangeError("minimum exceeded");
     if (a_value > maximum())
       throw RangeError("maximum exceeded");
+  }
+
+  // isValidRange
+  // less informative range check for manual python exception issues.
+  template<int A_MINIMUM, int A_MAXIMUM>
+    bool LRA<A_MINIMUM, A_MAXIMUM>::isValidRange(const double& a_value) const {
+    if (a_value < minimum())
+      return false;
+    if (a_value > maximum())
+      return false;
+    return true;
   }
 
   // add

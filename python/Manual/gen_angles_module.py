@@ -229,7 +229,7 @@ static PyObject* %(TypeName)s_nb_add(PyObject* o1, PyObject* o2) {
 
   Angles::%(TypeName)s the_sum(((%(TypeName)s*)o1)->m_angle + ((%(TypeName)s*)o2)->m_angle);
 
-  // copy because m_angle constructor has already run.
+  // copy because m_angle constructor is TBD.
   result_angle->m_angle = the_sum;
 
   return (PyObject*) result_angle;
@@ -254,7 +254,7 @@ static PyObject* %(TypeName)s_nb_subtract(PyObject* o1, PyObject* o2) {
 
   Angles::%(TypeName)s the_difference(((%(TypeName)s*)o1)->m_angle - ((%(TypeName)s*)o2)->m_angle);
 
-  // copy because m_angle constructor has already run.
+  // copy because m_angle constructor is TBD.
   result_angle->m_angle = the_difference;
 
   return (PyObject*) result_angle;
@@ -280,7 +280,7 @@ static PyObject* %(TypeName)s_nb_negative(PyObject* o1) {
 
   Angles::%(TypeName)s the_inverse = -((%(TypeName)s*)o1)->m_angle;
 
-  // copy because m_angle constructor has already run.
+  // copy because m_angle constructor is TBD.
   result_angle->m_angle = the_inverse;
 
   return (PyObject*) result_angle;
@@ -601,14 +601,17 @@ static int %(TypeName)s_init(%(TypeName)s* self, PyObject* args, PyObject* kwds)
   if (! PyArg_ParseTupleAndKeywords(args, kwds, "|ddd", kwlist, &degrees, &minutes, &seconds))
     return -1;
 
-  try {
-    // use constructor to raise an exception if the value is not in the valid range.
-    Angles::%(TypeName)s an_angle(Angles::degrees2seconds(degrees, minutes, seconds)/3600);
-    self->m_angle.value(an_angle.value());
-  } catch (Angles::Error err) {
-    PyErr_SetString(sAngleException, err.what());
+  // TODO self->m_angle not working at this point. All methods return 0 so it needs this stand-in.
+  Angles::%(TypeName)s an_angle; // this has validator max min
+
+  double a_value(Angles::degrees2seconds(degrees, minutes, seconds)/3600);
+
+  if (!an_angle.isValidRange(a_value)) {
+    PyErr_SetString(sAngleException, "invalid range");
     return -1;
   }
+
+  self->m_angle.value(a_value);
 
   return 0;
 }
@@ -661,14 +664,17 @@ static int %(TypeName)s_setValue(%(TypeName)s* self, PyObject* a_value, void* cl
     return 0;
   }
 
-  try {
-    // use constructor to raise an exception if the value is not in the valid range.
-    Angles::%(TypeName)s an_angle(PyFloat_AsDouble(a_value));
-    self->m_angle.value(an_angle.value());
-  } catch (Angles::Error err) {
-    PyErr_SetString(sAngleException, err.what());
+  // TODO self->m_angle not working at this point. All methods return 0 so it needs this stand-in.
+  Angles::%(TypeName)s an_angle; // this has validator max min
+
+  double d_value(PyFloat_AsDouble(a_value));
+
+  if (!an_angle.isValidRange(d_value)) {
+    PyErr_SetString(sAngleException, "invalid range");
     return -1;
   }
+
+  self->m_angle.value(d_value);
 
   return 0;
 }
@@ -729,15 +735,19 @@ static PyObject* %(TypeName)s_nb_add(PyObject* o1, PyObject* o2) {
     return NULL;
   }
 
-  try {
-    // use constructor to raise an exception if the value is not in the valid range.
-    Angles::%(TypeName)s the_sum(((%(TypeName)s*)o1)->m_angle.value() + ((%(TypeName)s*)o2)->m_angle.value());
-    result_angle->m_angle = the_sum; // copy because m_angle constructor has already run.
-    return (PyObject*) result_angle;
-  } catch (Angles::Error err) {
-    PyErr_SetString(sAngleException, err.what());
+  // TODO self->m_angle not working at this point. All methods return 0 so it needs this stand-in.
+  Angles::%(TypeName)s an_angle; // this has validator max min
+
+  double the_sum(((%(TypeName)s*)o1)->m_angle.value() + ((%(TypeName)s*)o2)->m_angle.value());
+
+  if (!an_angle.isValidRange(the_sum)) {
+    PyErr_SetString(sAngleException, "invalid range");
     return NULL;
   }
+
+  result_angle->m_angle.value(the_sum);
+
+  return (PyObject*) result_angle;
 }
 
 
@@ -757,15 +767,19 @@ static PyObject* %(TypeName)s_nb_subtract(PyObject* o1, PyObject* o2) {
     return NULL;
   }
 
-  try {
-    // use constructor to raise an exception if the value is not in the valid range.
-    Angles::%(TypeName)s the_difference(((%(TypeName)s*)o1)->m_angle.value() - ((%(TypeName)s*)o2)->m_angle.value());
-    result_angle->m_angle = the_difference;
-    return (PyObject*) result_angle;
-  } catch (Angles::Error err) {
-    PyErr_SetString(sAngleException, err.what());
+  // TODO self->m_angle not working at this point. All methods return 0 so it needs this stand-in.
+  Angles::%(TypeName)s an_angle; // this has validator max min
+
+  double the_difference(((%(TypeName)s*)o1)->m_angle.value() - ((%(TypeName)s*)o2)->m_angle.value());
+
+  if (!an_angle.isValidRange(the_difference)) {
+    PyErr_SetString(sAngleException, "invalid range");
     return NULL;
   }
+
+  result_angle->m_angle.value(the_difference);
+
+  return (PyObject*) result_angle;
 }
 
 
@@ -786,15 +800,19 @@ static PyObject* %(TypeName)s_nb_negative(PyObject* o1) {
     return NULL;
   }
 
-  try {
-    // use constructor to raise an exception if the value is not in the valid range.
-    Angles::%(TypeName)s the_inverse(-((%(TypeName)s*)o1)->m_angle.value());
-    result_angle->m_angle = the_inverse;
-    return (PyObject*) result_angle;
-  } catch (Angles::Error err) {
-    PyErr_SetString(sAngleException, err.what());
+  // TODO self->m_angle not working at this point. All methods return 0 so it needs this stand-in.
+  Angles::%(TypeName)s an_angle; // this has validator max min
+
+  double the_inverse(-((%(TypeName)s*)o1)->m_angle.value());
+
+  if (!an_angle.isValidRange(the_inverse)) {
+    PyErr_SetString(sAngleException, "invalid range");
     return NULL;
   }
+
+  result_angle->m_angle.value(the_inverse);
+
+  return (PyObject*) result_angle;
 }
 
 
@@ -813,15 +831,19 @@ static PyObject* %(TypeName)s_nb_multiply(PyObject* o1, PyObject* o2) {
     return NULL;
   }
 
-  try {
-    // use constructor to raise an exception if the value is not in the valid range.
-    Angles::%(TypeName)s the_product(((%(TypeName)s*)o1)->m_angle.value() * ((%(TypeName)s*)o2)->m_angle.value());
-    result_angle->m_angle = the_product;
-    return (PyObject*) result_angle;
-  } catch (Angles::Error err) {
-    PyErr_SetString(sAngleException, err.what());
+  // TODO self->m_angle not working at this point. All methods return 0 so it needs this stand-in.
+  Angles::%(TypeName)s an_angle; // this has validator max min
+
+  double the_product(((%(TypeName)s*)o1)->m_angle.value() * ((%(TypeName)s*)o2)->m_angle.value());
+
+  if (!an_angle.isValidRange(the_product)) {
+    PyErr_SetString(sAngleException, "invalid range");
     return NULL;
   }
+
+  result_angle->m_angle.value(the_product);
+
+  return (PyObject*) result_angle;
 }
 
 
@@ -841,8 +863,10 @@ static PyObject* %(TypeName)s_nb_divide(PyObject* o1, PyObject* o2) {
   }
 
   try {
-    // use constructor to raise an exception if the value is not in the valid range.
-    Angles::%(TypeName)s the_quotient(((%(TypeName)s*)o1)->m_angle.value() / ((%(TypeName)s*)o2)->m_angle.value());
+    // use constructor to raise an exception if the value is 
+    // not in the valid range or has a divide by zero error.
+    Angles::%(TypeName)s the_quotient(((%(TypeName)s*)o1)->m_angle.value() /
+                                      ((%(TypeName)s*)o2)->m_angle.value());
     result_angle->m_angle = the_quotient;
     return (PyObject*) result_angle;
   } catch (Angles::Error err) {

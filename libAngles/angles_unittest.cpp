@@ -507,6 +507,15 @@ namespace {
     EXPECT_EQ(-30, a.getValue());
   }
 
+  TEST(LimitedRangeAngle, is_valid_range) {
+    Angles::LimitedRangeAngle a;
+    EXPECT_TRUE(a.isValidRange(360));
+    EXPECT_FALSE(a.isValidRange(361));
+    EXPECT_TRUE(a.isValidRange(-360));
+    EXPECT_FALSE(a.isValidRange(-361));
+  }
+
+
   TEST(LimitedRangeAngle, radians_accessors) {
     Angles::LimitedRangeAngle a;
 
@@ -518,7 +527,7 @@ namespace {
 
   }
 
-  TEST(LimitedRangeAngle, value_ccessor_error) {
+  TEST(LimitedRangeAngle, value_accessor_error) {
     Angles::LimitedRangeAngle a;
     EXPECT_THROW(a.setValue(361), Angles::RangeError);
   }
