@@ -47,27 +47,81 @@ LimitedRangeAngle templates. Deep in the arithmetic operators, +, -,
 *, /, I found an undocumented feature: The Angle class can construct
 the result using the copy constructor, (e.g. + and -) or the copy
 assign constructor (e.g. * and /), but the template versions can
-not. (It was just the dumb luck of my choice of these construction
-techniques for these operators and lead to this finding.) This
-produces out of range errors, probably from using the addresses and
-not the values of the objects. This is not the case for the Boost
-version. The copy constructor test also fails. I have not yet figured
-out why this is so, but the work around is to use the values. For
-example where Angle::operator+() wraps:
+not.
+
+In the class version I can build the m_angle struct from the
+class objects:
 
 ```
-  Angles::%(TypeName)s the_sum(((%(TypeName)s*)o1)->m_angle + ((%(TypeName)s*)o2)->m_angle);
+    result_angle->m_angle = ((Angle*)o1)->m_angle / ((Angle*)o2)->m_angle;
 ```
 
-and builds the new angle from the copy constructor, the
-LimitedRangeAngle template uses the value constructor:
+This causes range exceptions when I try it with the tempalte forms.
+I work around the problemm by constructing from the values:
 
 ```
-  Angles::%(TypeName)s the_sum(((%(TypeName)s*)o1)->m_angle.value() + ((%(TypeName)s*)o2)->m_angle.value());
+      Angles::LimitedRangeAngle the_quotient(((LimitedRangeAngle*)o1)->m_angle.value() /
+					     ((LimitedRangeAngle*)o2)->m_angle.value());
 ```
 
-The template also has maximum and minimums and RangeError behaviors
-so this is not the only difference and two templates are still needed.
+I also found that the m_angle object's methods always return zero in the
+python wrapper context:
+
+```
+static int LimitedRangeAngle_init(LimitedRangeAngle* self, PyObject* args, PyObject* kwds) {
+
+  double degrees(0);
+  double minutes(0);
+  double seconds(0);
+
+  static char* kwlist[] = {sDegreeStr, sMinuteStr, sSecondStr, NULL};
+
+  if (! PyArg_ParseTupleAndKeywords(args, kwds, "|ddd", kwlist, &degrees, &minutes, &seconds))
+    return -1;
+
+  double a_value(Angles::degrees2seconds(degrees, minutes, seconds)/3600);
+
+  // Angles::LimitedRangeAngle an_angle(a_value); // hi error works with this out
+
+  std::cout << "not valid range " << self->m_angle.isValidRange(a_value)
+   << " value " << a_value
+   << " a value " << self->m_angle.value()
+   << " max " << self->m_angle.maximum()
+   << " min " << self->m_angle.minimum()
+   << std::endl;
+
+  if (self->m_angle.isValidRange(a_value) == true) {
+
+    std::stringstream emsg;
+    emsg << "not valid range " << a_value;
+
+    PyErr_SetString(sAngleException, emsg.str().c_str());
+    return -1;
+  }
+
+  self->m_angle.value(a_value);
+
+  std::cout << "not valid range " << self->m_angle.isValidRange(a_value)
+   << " value " << a_value
+   << " a value " << self->m_angle.value()
+   << " max " << self->m_angle.maximum()
+   << " min " << self->m_angle.minimum()
+   << std::endl;
+
+
+  return 0;
+}
+
+```
+
+produces
+
+```
+not valid range 0 value -129.282 a value 0 max 0 min 0
+not valid range 0 value -129.282 a value -129.282 max 0 min 0
+```
+
+I am still working out why this is so.
 
 
 ### Boost
@@ -103,7 +157,7 @@ The Boost wrappers have several differences from the manual extension.
 Unlike the current manual version, [Boost translates all C++ exceptions](http://www.boost.org/doc/libs/1_37_0/libs/python/doc/v2/exception_translator.html).
 
 (As seen below, it also notes Declination and Latitude have the same
-template. The manual version does not do this.)	
+template. The manual version does not do this.)
 
 
 ```
