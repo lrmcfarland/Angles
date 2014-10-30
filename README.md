@@ -62,10 +62,10 @@ run the unit tests. I have downloaded and built it in /usr/local by
 following the instructions in the README
 
 ```
-[root@lrmz-iMac gtest-1.7.0]# export GTEST_DIR=/usr/local/gtest-1.7.0
-[root@lrmz-iMac gtest-1.7.0]# g++ -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc
+[root gtest-1.7.0]# export GTEST_DIR=/usr/local/gtest-1.7.0
+[root gtest-1.7.0]# g++ -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc
 
-[root@lrmz-iMac gtest-1.7.0]# ar -rv libgtest.a gtest-all.o
+[root gtest-1.7.0]# ar -rv libgtest.a gtest-all.o
 ar: creating archive libgtest.a
 a - gtest-all.o
 ```
