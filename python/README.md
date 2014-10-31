@@ -10,9 +10,6 @@ investigating how to make it happen.
 
 ## Manual Python Bindings
 
-The manual extension has several differenced from the Boost wrappers.
-(This list is not definitive or complete. I am still working to resolve the differences.)
-
 ### has
 
 - rich comparison operators <, <=, ==, !=. >=, >
@@ -29,9 +26,6 @@ The manual extension has several differenced from the Boost wrappers.
 
 
 ## Boost
-
-The Boost wrappers have several differences from the manual extension.
-(This list is not definitive or complete. I am still working to resolve the differences.)
 
 ### has
 

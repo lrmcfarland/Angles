@@ -5,16 +5,15 @@
 This repo demonstrates how to take C++ templates into a Python module.
 I have a C++ angle class for use in astronomy applications. I start
 with constructors to create angles from degrees, minutes and seconds
-(doubles or strings). To make full featured objects I add the
+(as doubles or strings). To make full featured objects I add the
 copy and assign constructors and overload the basic arithmetic
 and boolean operators, e.g. +, +=, -, -=, >, <= et al.
 
-I have a C++ template to build sets of limited range angle
-objects like [declination](http://en.wikipedia.org/wiki/Declination)
-and [right
-ascension](http://en.wikipedia.org/wiki/Right_ascension). Objects
-built from this template will raise an exception if their range is
-exceed, either in the constructor or by a math operation like
+I have a C++ template to build sets of limited range angle objects
+like [declination](http://en.wikipedia.org/wiki/Declination) and
+[right ascension](http://en.wikipedia.org/wiki/Right_ascension). Objects
+built from this template will raise an exception if their valid range
+is exceed, either in the constructor or by a math operation like
 addition.
 
 I wrap these in Python by both [manually
@@ -39,7 +38,7 @@ $ make test
 
 libAngles must be built first. There is a build.sh script that runs
 the Makefiles in all the directories in the necessary order and takes
-these targets as command line arguments.
+the same make targets as above.
 
 ```
 $ pwd
@@ -78,8 +77,10 @@ up libgtest.a from there.
 
 I have been wanting to use [homebrew](http://brew.sh) to install
 boost, but some reason, I find it does not yet install
-libboost_python.a by default or even with the --with-python or
---build-from-source options. So I built and installed it from source.
+libboost_python.a by default or even with the --with-python and/or
+--build-from-source options. So I built and installed it from the
+source I downloaded from
+[here](http://www.boost.org/users/history/version_1_56_0.html).
 
 ```
 cd boost_1_56_0
@@ -89,9 +90,9 @@ cd boost_1_56_0
 sudo ./b2 install
 ```
 
-The files are now in /usr/local/include and /usr/local/lib/libboost_*
-and python/Boost/setup.py sets BOOST_ROOT to point there.
-brew doctor will notice and complain about this.
+The boost files are now in /usr/local/include/boost and
+/usr/local/lib/libboost_*.  python/Boost/setup.py sets BOOST_ROOT to
+point there.  brew doctor will notice and complain about this.
 
 
 ### OSX
@@ -140,7 +141,7 @@ int main () {
   try {
     Angles::Latitude a3(200);
   } catch (Angles::RangeError err) {
-    std::cout << "Error: " << err.what() << std::endl;
+    std::cout << "Caught RangeError: " << err.what() << std::endl;
   }
 
   return 0;

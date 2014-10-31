@@ -2,34 +2,8 @@
 
 """Generates angles.cpp for python wrappers.
 
-This file contanis the templates for generating angles.cpp for the
+This file contains the templates for generating angles.cpp for the
 different types of angles defined in libAngles.
-
-There are two types of objects wrapped, the Angle class and
-LimitedRangeAngle templates. Deep in the arithmetic operators, +, -,
-*, /, I found an undocumented feature: The Angle class can construct
-the result using the copy constructor, (e.g. + and -) or the copy
-assign constructor (e.g. * and /), but the template versions can
-not. (It was just whimsy that drove my choice of these construction
-techniques for these operators.) This produces out of range errors,
-probably from using the addresses and not the values of the
-objects. This is not the case for the Boost version. The copy
-constructor test also fails. I have not yet figured out why this is
-so, but the work around is to use the values. For example where
-Angle::operator+() wraps:
-
-  Angles::%(TypeName)s the_sum(((%(TypeName)s*)o1)->m_angle + ((%(TypeName)s*)o2)->m_angle);
-
-and builds the new angle from the copy constructor, the
-LimitedRangeAngle template uses the value constructor:
-
-  Angles::%(TypeName)s the_sum(((%(TypeName)s*)o1)->m_angle.value() + ((%(TypeName)s*)o2)->m_angle.value());
-
-The template also has maximum and minimums and RangeError behaviors
-so this is not the only difference and two templates are still needed.
-
-TODO: I still need to handle Angles::Error exceptions.
-
 """
 
 
