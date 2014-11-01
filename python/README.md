@@ -3,9 +3,7 @@
 These are my Python wrapper examples and their unit tests. I have
 found some interesting differences. For example it is not yet clear to
 me how to make the rich comparison operators work in Boost like they
-do manually or in [SWIG](swig.org) or wrap the exception handling
-manually. This is still a work in progress and I am still
-investigating how to make it happen.
+do manually or in [SWIG](swig.org). This is still a work in progress.
 
 
 ## Manual Python Bindings
