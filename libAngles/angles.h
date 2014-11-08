@@ -1,5 +1,5 @@
 // ================================================================
-// Filename:    angle.h
+// Filename:    angles.h
 //
 // Description: This is an implementation of angles, e.g. declination,
 //              right ascension, latitude and longitude as a full
@@ -45,8 +45,6 @@
 #include <stdexcept>
 
 #include <utils.h>
-
-
 
 namespace Angles {
 
@@ -171,28 +169,6 @@ namespace Angles {
   Angle operator/ (const Angle& lhs, const Angle& rhs) throw (DivideByZeroError);
 
   
-  std::ostream& operator<< (std::ostream& os, const Angles::Angle& a) {
-
-    bool isNegative(false);
-
-    if (a.value() < 0)
-      isNegative = true;
-
-    double degrees = fabs(a.value());
-    double minutes = 60 * (degrees - floor(degrees));
-    double seconds = 60 * (minutes - floor(minutes));
-
-    if (isNegative)
-      degrees = -1 * floor(degrees);
-    else
-      degrees = floor(degrees);
-
-    os << degrees << "* " << floor(minutes) << "\' " << seconds << "\"";
-
-    return os;
-  }
-
-
   // =============================
   // ===== LimitedRangeAngle =====
   // =============================
@@ -487,79 +463,21 @@ namespace Angles {
   typedef LRA<0, 24>     RA; // Right Ascension
 
 
+  // output operator<<
+  void value2DMSString(const double& a_value, std::stringstream& a_string);
+  void value2HMSString(const double& a_value, std::stringstream& a_string);
 
-  // operator<<
+  // TODO must be here for Boost templates?
+  // TODO problems with linking object files that have angle.h
+  // TODO use .hpp?
 
-  void value2DMSString(const double& a_value, std::stringstream& a_string) {
-
-    bool isNegative(false);
-
-    if (a_value < 0)
-      isNegative = true;
-
-    double degrees = fabs(a_value);
-    double minutes = 60 * (degrees - floor(degrees));
-    double seconds = 60 * (minutes - floor(minutes));
-
-    if (isNegative)
-      degrees = -1 * floor(degrees);
-    else
-      degrees = floor(degrees);
-
-    a_string << degrees << "* " << floor(minutes) << "\' " << seconds << "\"";
-
-  }
-
-  void value2HMSString(const double& a_value, std::stringstream& a_string) {
-
-    bool isNegative(false);
-
-    if (a_value < 0)
-      isNegative = true;
-
-    double degrees = fabs(a_value);
-    double minutes = 60 * (degrees - floor(degrees));
-    double seconds = 60 * (minutes - floor(minutes));
-
-    if (isNegative)
-      degrees = -1 * floor(degrees);
-    else
-      degrees = floor(degrees);
-
-    a_string << degrees << ":" << floor(minutes) << ":" << seconds; // TODO use this form for others?
-
-  }
-
-  // TODO template this? meh. ambiguity problems.
-
-  std::ostream& operator<< (std::ostream& os, const LimitedRangeAngle& a) {
-    std::stringstream out;
-    value2DMSString(a.value(), out);
-    return os << out.str();
-  }
-
-  std::ostream& operator<< (std::ostream& os, const Declination& a) {
-    std::stringstream out;
-    value2DMSString(a.value(), out);
-    return os << out.str();
-  }
-
-
-  // typedef Latitude looks like redefinition of Declination. Works ok as same.
-
-
-  std::ostream& operator<< (std::ostream& os, const Longitude& a) {
-    std::stringstream out;
-    value2DMSString(a.value(), out);
-    return os << out.str();
-  }
-
-  std::ostream& operator<< (std::ostream& os, const RA& a) {
-    std::stringstream out;
-    value2HMSString(a.value(), out);
-    return os << out.str();
-  }
-
-
+  std::ostream& operator<< (std::ostream& os, const Angles::Angle& a);
+  std::ostream& operator<< (std::ostream& os, const Angles::LimitedRangeAngle& a);
+  std::ostream& operator<< (std::ostream& os, const Angles::Declination& a);
+  std::ostream& operator<< (std::ostream& os, const Angles::Longitude& a);
+  std::ostream& operator<< (std::ostream& os, const Angles::RA& a);
 
 } // end namespace Angles
+
+#include <angles.hpp>
+

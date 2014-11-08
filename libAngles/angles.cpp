@@ -127,7 +127,44 @@ void Angles::Angle::normalize() {
 
 
 
+// operator<<
 
+void Angles::value2DMSString(const double& a_value, std::stringstream& a_string) {
 
+  bool isNegative(false);
 
+  if (a_value < 0)
+    isNegative = true;
 
+  double degrees = fabs(a_value);
+  double minutes = 60 * (degrees - floor(degrees));
+  double seconds = 60 * (minutes - floor(minutes));
+
+  if (isNegative)
+    degrees = -1 * floor(degrees);
+  else
+    degrees = floor(degrees);
+
+  a_string << degrees << "* " << floor(minutes) << "\' " << seconds << "\"";
+
+}
+
+void Angles::value2HMSString(const double& a_value, std::stringstream& a_string) {
+
+  bool isNegative(false);
+
+  if (a_value < 0)
+    isNegative = true;
+
+  double degrees = fabs(a_value);
+  double minutes = 60 * (degrees - floor(degrees));
+  double seconds = 60 * (minutes - floor(minutes));
+
+  if (isNegative)
+    degrees = -1 * floor(degrees);
+  else
+    degrees = floor(degrees);
+
+  a_string << degrees << ":" << floor(minutes) << ":" << seconds; // TODO use this form for others?
+
+}
