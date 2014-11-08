@@ -1,7 +1,7 @@
 // ==================================================================
-// Filename:    sexagesimal.cpp
-// Description: Implements the sexagesimal class
-//              This file is part of lrm's Orbits software library.
+// Filename:    angles.cpp
+//
+// Description: This implements the angles class.
 //
 // Author:      L.R. McFarland, lrm@starbug.com
 // Created:     2014 June 19
