@@ -1,6 +1,6 @@
 # Angles
 
-## Superseded by [Coordinates](https://github.com/lrmcfarland/Coordinates))
+## Superseded by [Coordinates](https://github.com/lrmcfarland/Coordinates)
 
 ## Features
 
