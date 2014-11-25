@@ -18,8 +18,8 @@ do manually or in [SWIG](swig.org). This is still a work in progress.
 
 ### has not
 
-- copy constructor
-- copy assign
+- TODO copy constructor (see [Coordinates](https://github.com/lrmcfarland/Coordinates))
+- TODO copy assign (see [Coordinates](https://github.com/lrmcfarland/Coordinates))
 - properties, e.g. a_space.x() not a_space.x
 
 

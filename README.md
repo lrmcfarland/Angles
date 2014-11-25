@@ -1,6 +1,9 @@
 # Angles
 
+## Superseded by [Coordinates](https://github.com/lrmcfarland/Coordinates))
+
 ## Features
+
 
 This repo demonstrates how to take C++ templates into a Python module.
 I have a C++ angle class for use in astronomy applications. I start

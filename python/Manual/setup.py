@@ -1,4 +1,4 @@
-# builds python orbits module
+# builds python angles module
 # from http://docs.python.org/extending/building.html
 
 from distutils.core import setup, Extension
